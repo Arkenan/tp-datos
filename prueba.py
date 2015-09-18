@@ -3,6 +3,7 @@
 
 
 import csv
+import gzip
 
 from collections import Counter, defaultdict
 
@@ -25,14 +26,14 @@ for district, count in crimes_by_district.items():
 
 with open('test.csv') as f:
     reader = csv.DictReader(f)
-    result = [list(categories)]
+    result = [['Id'] + list(categories)]
     for test in reader:
-        row = []
+        row = [test['Id']]
         for category in categories:
             row.append(percentage_by_district[test['PdDistrict']][category])
         result.append(row)
 
-with open('result.csv', 'wb') as csvfile:
+with gzip.open('result.csv.gz', 'wb') as csvfile:
     writer = csv.writer(csvfile, delimiter=',')
     for row in result:
         writer.writerow(row)
