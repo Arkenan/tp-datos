@@ -1,0 +1,4 @@
+
+
+Weak learner: clasificador que tiene poca correlación con la clasificación certera, pero puede clasificar ejemplos mejor que una clasificación random.
+Strong learner: clasificador que es arbitrariamente bien correlacionado con la clasificación certera.
