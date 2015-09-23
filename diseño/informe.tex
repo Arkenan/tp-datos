@@ -1,0 +1,101 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{url}
+\usepackage{color}
+\usepackage{fullpage}
+\usepackage{float}
+
+\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
+
+\lstloadlanguages{Haskell}
+
+\graphicspath{ {images/} }
+
+\setlength{\footskip }{20pt}
+\setlength{\headsep }{30pt}
+\addtolength{\textheight}{-40pt}
+
+
+\lstset{
+  frame=none,
+  xleftmargin=25pt,
+  stepnumber=1,
+  numbers=left,
+  numbersep=5pt,
+  numberstyle=\ttfamily\tiny\color[gray]{0.3},
+  belowcaptionskip=\bigskipamount,
+  captionpos=b,
+  escapeinside={*'}{'*},
+  language=haskell,
+  tabsize=2,
+  emphstyle={\bf},
+  commentstyle=\it,
+  stringstyle=\mdseries\rmfamily,
+  showspaces=false,
+  keywordstyle=\bfseries\rmfamily,
+  columns=flexible,
+  basicstyle=\small\sffamily,
+  showstringspaces=false,
+  morecomment=[l]\%,
+  backgroundcolor=\color{lightgray},
+}
+
+\urlstyle{same}
+
+\title{Haskell}
+
+\begin{document}
+
+% \input{partes/title.tex}
+% \mktitle
+
+\pagestyle{fancy}
+\lhead{\slshape \leftmark}
+\rhead{Página \thepage\  de  \pageref{LastPage}}
+\chead{\scalebox{0.1}{asasasa}}
+\lfoot{Universidad de \\ Buenos Aires}
+\cfoot{Organización \\ De Datos}
+\rfoot{Arjovsky, Gavrilov, Ledesma\\}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+  \tableofcontents
+  \clearpage
+
+  % \input{partes/abstract.tex}
+
+  % \input{partes/about.tex}
+
+  % Los algoritmos consumen numeritos y nosotros tenemos palabritas...... Como convertir datos, que variables usar, que features pensamos, graficos, conclusiones sobre los graficos, etc. Posibles datos externos.
+  % Los X e Y que estan afuera
+  % \input{partes/tratamiento.tex}
+
+  % Algoritmos a usar (algoritmos probados, submissions, etc.) Explayarse sobre el algoritmo, consta de tales partes, y eso.
+  % \input{partes/algorithms.tex}
+
+  % los4JinetesDeLaEntropia
+
+  % Como vamos a encarar las cosas en C++, implementación, mencionar librerias
+  % \input{partes/implementation.tex}
+
+  % ??????????????
+  % \input{partes/conclusion.tex}
+
+
+\clearpage
+\begin{thebibliography}{3}
+
+\bibitem{Common01}
+  Foo, http://bar.baz
+
+\end{thebibliography}
+
+\end{document}
