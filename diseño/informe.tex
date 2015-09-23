@@ -12,6 +12,7 @@
 \usepackage{color}
 \usepackage{fullpage}
 \usepackage{float}
+\usepackage{booktabs}
 
 \definecolor{lightgray}{rgb}{0.95,0.95,0.95}
 
@@ -21,8 +22,8 @@
 
 \setlength{\footskip }{20pt}
 \setlength{\headsep }{30pt}
+\setlength{\headheight}{13pt}
 \addtolength{\textheight}{-40pt}
-
 
 \lstset{
   frame=none,
@@ -49,13 +50,14 @@
 }
 
 \urlstyle{same}
-
-\title{Haskell}
+% \title{Organización de Datos\\Diseño del Trabajo Práctico}
+% \date{24 de Septiembre del 2015}
+% \author{Tomás Arjovsky, Vsevolod Gavrilov, Nicolás Ledesma}
 
 \begin{document}
 
-% \input{partes/title.tex}
-% \mktitle
+\input{partes/title.tex}
+% \maketitle
 
 \pagestyle{fancy}
 \lhead{\slshape \leftmark}
@@ -70,13 +72,13 @@
   \tableofcontents
   \clearpage
 
-  % \input{partes/abstract.tex}
+  \input{partes/abstract.tex}
 
   % \input{partes/about.tex}
 
   % Los algoritmos consumen numeritos y nosotros tenemos palabritas...... Como convertir datos, que variables usar, que features pensamos, graficos, conclusiones sobre los graficos, etc. Posibles datos externos.
   % Los X e Y que estan afuera
-  % \input{partes/tratamiento.tex}
+  \input{partes/features.tex}
 
   % Algoritmos a usar (algoritmos probados, submissions, etc.) Explayarse sobre el algoritmo, consta de tales partes, y eso.
   % \input{partes/algorithms.tex}
