@@ -1,0 +1,35 @@
+
+\section{Tratamiento de datos} % (fold)
+\label{sec:tratamiento_de_datos}
+
+
+El set de datos proporcionado en su estado inicial no sirve para aplicarle los algoritmos típicos de machine learning: contiene datos que un algortimo matemático no tiene una forma de interpretar práctica.
+
+\begin{table}
+\centering
+\resizebox{\textwidth}{!}{
+
+\begin{tabular}{lllllllrr}
+\toprule
+               Dates &         Category &                                           Descript &  DayOfWeek &  PdDistrict &                        Resolution &                      Address &         X &         Y \\
+\midrule
+ 2005-11-16 10:00:00 &    LARCENY/THEFT &                       GRAND THEFT FROM LOCKED AUTO &  Wednesday &    NORTHERN &                              NONE &    1500 Block of FILLMORE ST & -0.400142 &  0.694857 \\
+ 2013-04-17 10:55:00 &   OTHER OFFENSES &  RESTRAINING ORDER NOTIFICATION/SERVICE OF REST... &  Wednesday &     MISSION &  COMPLAINANT REFUSES TO PROSECUTE &     500 Block of VALENCIA ST &  0.035068 & -0.121903 \\
+ 2014-11-16 13:43:00 &  STOLEN PROPERTY &  STOLEN PROPERTY, POSSESSION WITH KNOWLEDGE, RE... &     Sunday &  TENDERLOIN &                    ARREST, BOOKED &     100 Block of OFARRELL ST &  0.613777 &  0.808212 \\
+ 2010-07-18 12:45:00 &            FRAUD &                          SHORT CHANGE, PETTY THEFT &     Sunday &        PARK &                              NONE &   500 Block of DIVISADERO ST & -0.586468 &  0.311033 \\
+ 2005-07-26 23:00:00 &     NON-CRIMINAL &                       AIDED CASE, MENTAL DISTURBED &    Tuesday &     TARAVAL &                 PSYCHOPATHIC CASE &     3100 Block of TARAVAL ST & -3.047246 & -1.034459 \\
+ 2012-03-06 08:05:00 &    LARCENY/THEFT &                     PETTY THEFT FROM UNLOCKED AUTO &    Tuesday &   INGLESIDE &                              NONE &    900 Block of ELLSWORTH ST &  0.247018 & -1.408019 \\
+ 2011-04-06 19:00:00 &    LARCENY/THEFT &                       GRAND THEFT FROM LOCKED AUTO &  Wednesday &    NORTHERN &                              NONE &       FRANKLIN ST / GEARY BL & -0.010599 &  0.763399 \\
+ 2011-06-27 22:45:00 &   OTHER OFFENSES &                                         CONSPIRACY &     Monday &     MISSION &                    ARREST, BOOKED &        3900 Block of 18TH ST & -0.353849 & -0.243859 \\
+ 2006-03-21 18:48:00 &    LARCENY/THEFT &                            PETTY THEFT SHOPLIFTING &    Tuesday &    SOUTHERN &                    ARREST, BOOKED &       800 Block of MARKET ST &  0.598375 &  0.709911 \\
+ 2010-01-27 09:30:00 &    DRUG/NARCOTIC &                          SALE OF BASE/ROCK COCAINE &  Wednesday &  TENDERLOIN &                    ARREST, BOOKED &  0 Block of UNITEDNATIONS PZ &  0.334233 &  0.529671 \\
+\bottomrule
+\end{tabular}
+
+}
+\caption{Algunos datos aleatorios del set de entrenamiento}
+\end{table}
+
+
+
+% section tratamiento_de_datos (end)
