@@ -44,7 +44,7 @@ Y particularmente para la red de arriba se cumple que
 a^{(1)} = x \\
 a^{(3)} = h_{\Theta}
 \end{eqnarray}
-\paragraph{Función de costo.} Como es un problema de clasificación, al igual que en un problema de regresión logística, se usa una función de costo logarítmica, pero se suma el costo para la probabilidad asignada a cada clase.
+\paragraph{Función de costo} Como es un problema de clasificación, al igual que en un problema de regresión logística, se usa una función de costo logarítmica, pero se suma el costo para la probabilidad asignada a cada clase.
 
 \begin{equation}
 J(\Theta) = -{1}/{m} \left[ \sum_{i = 1}^{m}\sum_{k = 1}^{K} y_k^{(i)}log(h_\Theta(x^{(i)})_k) + (1-y_k^{(i)})(1-log(h_\Theta(x^{(i)})_k)) \right]
@@ -57,3 +57,81 @@ J(\Theta) = 1/m \sum_{i=1}^{m}J(\Theta)^{(i)}
 \end{equation}
 
 Una segunda observación es que basta conocer la salida de la última capa para poder obtener el costo de la predicción. Estas dos serán asunciones que tendremos que hacer más adelante para el algoritmo de \emph{Backpropagation}.
+
+\paragraph{Backpropagation} Como se desea hacer descenso por el gradiente para minimizar el costo, es necesario computar el gradiente de la función de costo según los parámetros $\Theta_{ij}^{(l)}$. Sin embargo, calcular manualmente las derivadas de la hipótesis en cuanto a los parámetros de todas las matrices se vuelve complicado por la cantidad de pasos intermedios que hay entre la primera y la última capa. Además, si así se calculara sería poco generalizable ya que dependería de la estructura de la red y de la cantidad de capas ocultas.
+
+Para solucionar este problema surgió en los 70\cite{chap2} un algoritmo llamado \emph{backpropagation}, que permite calcular las derivadas parciales en función capa a capa, partiendo de los resultados. Recordando la primera observación sobre la función de costo, trabajaremos solo con el costo individual para un ejemplo, y para simplificar la notación, lo llamaremos simplemente $J$.
+
+Para comenzar, definimos provisionalmente un error de cada neurona como el cambio del costo en función de su entrada:
+\begin{equation}
+\delta_i^{(l)} = \frac{\partial J}{\partial z_i^{(l)}}
+\end{equation}
+
+Particularizamos este error en la última capa $(L)$:
+\begin{equation}
+\delta_i^{(L)} = \frac{\partial J}{\partial z_i^{(L)}} = \frac{\partial J}{\partial h_{\Theta_i}}\frac{dh_{\Theta_i}}{dz_i^{(L)}} = \frac{\partial J}{\partial h_{\Theta_i}}g'(z_i^{(L)})
+\end{equation}
+
+Para el caso particular de la activación sigmoidea y del costo logarítmico:
+\begin{equation}
+\delta_i^{L} = h_{\Theta_i} - y_{i}
+\end{equation}
+
+O directamente en forma vectorial:
+\begin{equation} \label{eq:errorFinal}
+\delta^{L} = h_{\Theta} - y
+\end{equation}
+
+Teniendo este error, lo que backpropagation propone (como su nombre lo indica) es propagar el error hacia atrás, obteniendo el error de la capa $l$ en función del de la capa $l+1$. Llamo $J_l$ al costo en función de los inputs $z$ de la capa $l$ (o sea, $J(z_1^{(l)}, ... , z_{n_l}^{(l)})$), y $J_{l+1}$ al costo en función de los costos de la capa l+1(o sea, $J(z_1^{(l+1)}, ... , z_{n_{l+1}}^{(l+1)})$). De esta forma, podemos decir:
+\begin{equation}
+J_l(z^{(l)}) = J_{l+1}(\Theta^{(l)} g(z^{(l)})) 
+\end{equation}
+y aplicando la regla de la cadena en forma vectorial:
+\begin{equation}
+\nabla J_l(z^{(l)})^T = \nabla J_{l+1}(\Theta^{(l)} g(z^{(l)}))^T D(\Theta^{(l)} g(z^{(l)}))
+\end{equation}
+Los gradientes $J_l$ y $J_l+1$ son las derivadas de la función de costo respecto a $z^{(l)}$ y $z^{(l+1)}$, que son justamente los errores $\delta$ de aquellas capas. La matriz diferencial de la derecha se calcula fácilmente y la ecuación anterior queda:
+\begin{equation}
+\delta^{(l)^T} = \delta^{(l+1)^T} \Theta^{(l)} \odot g'(z^{(l)})^T
+\end{equation}
+Donde $\odot$ es el producto elemento a elemento entre vectores, o ``Producto de Hadamard''. Trasponiendo:
+\begin{equation}
+\delta^{(l)} = \Theta^{(l)^T} \delta^{(l+1)} \odot g'(z^{(l)})
+\end{equation}
+Con lo cual obtuvimos el error en una capa, vectorialmente, dado el error de la capa siguiente. Particularmente, como la función de activación g es la sigmoidea y su derivada es conocida:
+\begin{equation}
+\delta^{(l)} = \Theta^{(l)^T} \delta^{(l+1)} \odot g(z^{(l)}) \odot (1-g(z^{(l)}))
+\end{equation}
+\begin{equation} \label{eq:error}
+\delta^{(l)} = \Theta^{(l)^T} \delta^{(l+1)} \odot a^{(l)} \odot (1-a^{(l)})
+\end{equation}
+
+Ahora, lo único que falta es calcular, teniendo los errores $\delta$ de cada capa, poder calcular las derivadas del costo no según las entradas, sino según los parámetros de cada $\Theta$, que era nuestro objetivo original. De forma análoga a la última resolución, llamamos $J_{\Theta^{(l)}}$ al costo como función de los parámetros de combinación lineal de la capa $l$ a la capa $l+1$ y $J_{z^{(l+1)}}$ al costo como función de las entradas de la capa $l+1$.
+
+\begin{equation}
+D J_{\Theta^{(l)}}^T = \nabla J_{z^{(l+1)}}^T D_{\Theta^{(l)}} (\Theta^{(l)} z^{(l)})
+\end{equation}
+
+Como lo que nos interesa no es en sí la forma vectorial separada por capas, sino armar un gradiente con todos los parámetros, entonces queda expresado cada componente de la siguiente forma:
+
+\begin{equation} \label{eq:params}
+\frac{\partial J}{\partial \Theta_{ij}^{(l)}} = \frac{\partial J}{\partial z_j^{l+1}}g(z_i^{(l)}) = \delta_j^{(l+1)}a_i^{(l)}
+\end{equation}
+
+De esta manera pudimos, a través de únicamente lo obtenido en la última capa (hipótesis) generar las derivadas parciales respecto a cada parámetro para un ejemplo en particular.
+
+Resumiendo los pasos:
+\begin{description}
+\item[FeedForward:] se toma el ejemplo y se obtiene la hipótesis yendo hacia adelante en las capas.
+\item[Backpropagation:] se toma la hipótesis obtenida en el paso anterior y se buscan las derivadas según los siguientes pasos:
+	\begin{enumerate}
+	\item Calcular el error de la última capa como diferencia entre la hipótesis y los datos conocidos (ecuación \ref{eq:errorFinal}).
+	\item Propagar los errores hacia atrás con la matriz de parámetros traspuesta y la capa siguiente (ecuación \ref{eq:error}).
+	\item Una vez obtenidos los errores calcular a través de ellos las derivadas parciales respecto a los parámetros con la ecuación \ref{eq:params}.
+	
+	\end{enumerate}
+\end{description}
+
+\paragraph{Bias} Al igual que en la regresión logística se añadía un término independiente a la combinación lineal, en las redes neuronales se añade en cada capa una neurona que tiene siempre activación (salida) 1. Esto no afecta las cuentas hechas atrás. Lo único que cambia es el tamaño de las matrices $\Theta$, que tendrán una columna más para cada capa.
+
+\paragraph{Regularización} También, como ya veníamos haciendo, para evitar el overfitting, habrá una penalización en el costo para los valores de parámetros muy altos.
