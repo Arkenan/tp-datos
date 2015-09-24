@@ -5,11 +5,11 @@
 \subsection{Regresión Logística} % (fold)
 \label{sub:regresion_logistica}
 
-La regresión logística a pesar de su nombre es un algoritmo de clasificación, el cual puede implementarse para realizar una clasificación binaria, o una clasificación de múltiples valores posibles. 
+La regresión logística a pesar de su nombre es un algoritmo de clasificación, el cual puede implementarse para realizar una clasificación binaria, o una clasificación de múltiples valores posibles.
 
 El modelo de la regresión logística es análogo al de la regresión lineal, dado que tal como la misma, parte de una función hipótesis que se le aplica a los datos de entrada.
 \begin{equation}
-h_{\theta}(x)= \Theta^T \cdot x 
+h_{\theta}(x)= \Theta^T \cdot x
 \end{equation}
 \begin{small}
 Esta es la representación vectorial de la función hipótesis de la regresión lineal. Donde $X$ es el vector traspuesto de datos $x_{i}$, y $\Theta^T$ es el vector de pesos $\theta_{j}$.
@@ -20,7 +20,7 @@ En el caso de la regresión lineal, el valor de retorno de la función hipótesi
 \paragraph{Función sigmoidal.}
 En el caso particular de la regresión logística, la función hipótesis se construye de la siguiente manera:
 \begin{equation}
-h_{\theta}(x)= \frac{1}{1+e^{- \Theta^T\cdot x }} 
+h_{\theta}(x)= \frac{1}{1+e^{- \Theta^T\cdot x }}
 \end{equation}
 
 Similarmente, la hipótesis de la regresión logística utiliza el vector de datos de entrada $X$ y el de pesos $\Theta$, y su función retorna un valor escalar. Sin embargo, esta nueva función otorga una ventaja al retornar un número escalar real comprendido entre 1 y 0. Este tipo de función se llama función sigmoidal, y el valor escalar comprendido entre 1 y 0 se puede interpretar como una probabilidad.
@@ -44,12 +44,12 @@ Sin embargo, hasta el momento el algoritmo parece ser sólo diseñado para resol
 \paragraph{Estimación y Función de Costo.}
 De esta manera se cuenta con una serie de funciones $h_{\theta}^k(x)$ donde $k$ es el número de la clase que representa la función. A través del valor de retorno de todas estas funciones se obtiene entonces la probabilidad de cada clase distinta para cada caso del set de valores de entrada.
 
-Este conjunto de probabilidades obtenido, es una estimación, y esa estimación debe aproximarse al valor deseado. En este trabajo disponemos de un set de entrenamiento asociado a las clasificaciones correctas. El objetivo de la regresión logística es esbozar una función de costo dados los pesos $\theta_{j}$ . De esta manera, optimizando (o minimizando) la función costo se pueden corregir los pesos $\theta_{j}$, de forma que las estimaciones posteriores se asemejen cada vez más a los valores deseados o ``correctos''. 
+Este conjunto de probabilidades obtenido, es una estimación, y esa estimación debe aproximarse al valor deseado. En este trabajo disponemos de un set de entrenamiento asociado a las clasificaciones correctas. El objetivo de la regresión logística es esbozar una función de costo dados los pesos $\theta_{j}$ . De esta manera, optimizando (o minimizando) la función costo se pueden corregir los pesos $\theta_{j}$, de forma que las estimaciones posteriores se asemejen cada vez más a los valores deseados o ``correctos''.
 
 A continuación se muestra un ejemplo ilustrativo de una definición de función de costo:
 
 \begin{equation}
-J(h_{\theta }(x),y) = \begin{cases} 
+J(h_{\theta }(x),y) = \begin{cases}
 - \log h_{\theta}(x) & \textit{si $y \equiv 1$} \\
 - \log (1- h_{\theta}(x)) & \textit{si $y \equiv 0$}
 \end{cases}
@@ -58,7 +58,7 @@ J(h_{\theta }(x),y) = \begin{cases}
 La conveniencia de esta función de costo es que:
 
 \begin{itemize}
-  \item Cuando el valor esperado es $1$, y la estimación se aproxima a $0$, el costo tiende a $\infty$. 
+  \item Cuando el valor esperado es $1$, y la estimación se aproxima a $0$, el costo tiende a $\infty$.
   \item Cuando el valor esperado es $1$, y la estimación se aproxima a $1$, el costo tiende a $0$.
   \item Cuando el valor esperado es $0$, y la estimación se aproxima a $1$, el costo tiende a $\infty$.
   \item Cuando el valor esperado es $0$, y la estimación se aproxima a $0$, el costo tiende a $0$.
@@ -68,14 +68,20 @@ Esto ocurre gracias a que las funciones logarítmicas de cada caso se comportan 
 
 \begin{figure}[H]
 \centering
-\subfloat[][]{
-   \includegraphics[width=48mm]{minusLogX}
- }
-\subfloat[][]{
-   \includegraphics[width=37mm]{minusLog1minusX}
- }
- \caption{Gráficas:  (a)  \hspace{0.1cm} $y = - \log (x)$  \hspace{0.2cm} (b) \hspace{0.1cm} $y = - \log (1-x)$}
- \label{fig:logCurves}
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{minusLogX}
+  \caption{$y = - \log (x)$}
+  \label{fig:minusLogX}
+\end{subfigure}%
+\begin{subfigure}{.34\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{minusLog1minusX}
+  \caption{$y = - \log (1-x)$}
+  \label{fig:minusLog1minusX}
+\end{subfigure}
+\caption{Gráficas}
+\label{fig:minusLog}
 \end{figure}
 
 Análogamente, se pueden definir funciones de costo de forma contínua, obteniendo comportamientos similares. En el caso particular de la clase LogisticRegression implementada en el paquete de python \textit{sklearn}, una función de costo utilizada es la siguiente:
@@ -88,11 +94,11 @@ Donde:
 \begin{itemize}
   \item $X_{i}$ es el vector de parámetros de entrada del i-ésimo caso de un set de entrenamiento.
   \item $y_{i}$ es el valor correcto conocido del i-ésimo caso de un set de entrenamiento.
-  \item $c$ es una constante de ajuste, al igual que los pesos comprendidos en el vector $\Theta$. 
+  \item $c$ es una constante de ajuste, al igual que los pesos comprendidos en el vector $\Theta$.
   \item $\Theta^T \cdot \Theta$ y $C$ son complementos de la función de costo pensados para regularizarla, suavizando su comportamiento con el fin de evitar cometer \textit{overfitting}.
 \end{itemize}
 
-\paragraph{Optimización.} 
+\paragraph{Optimización.}
 Por último, queda detallar el método de optimización utilizado por la regresión logística. Los métodos de optimización de la función de costo pueden ser derivativos o no derivativos.
 
 El método derivativo clásico es el descenso por el gradiente. El descenso por el gradiente consiste en calcular el gradiente de la función costo. De esta forma se obtiene la dirección y sentido de máximo crecimiento de la función. Con el fin de minimizarla, lo que se hace es, a través de un escalar que se denomina \textit{paso} de la optimización, se van variando los valores de $\theta_{i}$ en la misma dirección y sentido opuesto que el gradiente, de forma de apuntar hacia la minimización de la función de costo. Esto se realiza iterativamente, recalculando el gradiente de la función costo con los parámetros $\theta_{i}$ actualizados.
