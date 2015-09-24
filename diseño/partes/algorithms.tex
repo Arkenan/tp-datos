@@ -115,8 +115,8 @@ A continuación se muestra una gráfica que ilustra este método de optimizació
 \end{figure}
 
 En su forma vectorial, el descenso por el gradiente podría verse con la siguiente fórmula de actualización:
-\begin{equation}
-\theta := \theta - \alpha \nabla J
+\begin{equation} \label{eq:gdesc}
+\theta := \theta - \alpha \nabla J(\theta)
 \end{equation}
 
 \subsubsection{Feature Scaling}
@@ -147,7 +147,22 @@ Y en forma vectorial:
 J(\theta) = \frac{1}{m}\left[ -y^Tlog(h_\theta(x)) - (1-y)^Tlog(1-h_\theta(x)) + \theta^T\theta\right]
 \end{equation}
 
-De todos modos hay que tener en cuenta que no se regulariza el parámetro del término independiente, con lo cual en el término de la derecha deben extraerse primero los $\theta_0$.
+De todos modos hay que tener en cuenta que no se regulariza el parámetro del término independiente, con lo cual en el término de la derecha ($\theta^t\theta$) deben extraerse primero los $\theta_0$.
 
 \subsubsection{Stochastic Gradient Descent}
+Para conjuntos de datos muy grandes, tales como el que se nos presenta de crímenes en San Francisco, puede ser muy costoso sumar sobre todos los 800.000 ejemplos antes de avanzar un paso. El descenso por el gradiente estocástico, mezcla aleatoriamente los ejemplos y luego va iterando sobre aquellos, en cada paso bajando por la contribución que tiene cada uno al gradiente.
+
+El descenso por el gradiente clásico (en tanda), según lo expuesto en la ecuación \ref{eq:gdesc}, puede expresarse componente a componente:
+\begin{equation}
+\theta_j := \theta_j - \alpha\frac{1}{m}\sum_{i = 1}^{m}(h_\theta(x^{(i)}) - y^{(i)})x_j^{(i)}
+\end{equation}
+Pero podemos observar que las componentes de la sumatoria son la parte que cada ejemplo contribuye al gradiente. Tomando este concepto, en lugar de sumar todos los valores antes de avanzar, el descenso por el gradiente estocástico baja un poco por cada ejemplo que recorre, a través de la contribución que este otorga al gradiente \cite{andrewStock}.
+
+\begin{equation}
+\theta_j := \theta_j - \alpha(h_\theta(x^{(i)}-y^{(i)}))x_j^{(i)}
+\end{equation}
+Esto último se hace para cada uno de los ejemplos y luego se vuelve a comenzar con el primero, hasta que el resultado sea el deseado.
+
+Una variante de este método es una mezcla entre el descenso por el gradiente en tanda y estocástico, que agarra pequeñas tandas, de por ejemplo, 10 casos de entrenamiento cada una. Esto permite aprovechar las ventajas de vectorizar las cuentas que provee la versión en tanda y la ventaja de no tardar tanto tiempo hasta hacer un paso que provee la implementación estocástica.
+
 \input{./partes/redes.tex}
