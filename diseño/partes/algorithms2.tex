@@ -11,8 +11,8 @@ El concepto es interesante, pero su aplicación con nuestro set falló en la pr�
 
 % subsubsection random_forest (end)
 
-\subsection{Support Vector Machine} % (fold)
-\label{sub:support_vector_machine}
+\subsubsection{Support Vector Machine} % (fold)
+\label{ssub:support_vector_machine}
 
 El método conocido bajo este nombre es un modelo para aprendizaje supervisado. Este modelo tiene algoritmos asociados, que reconocen analizan los datos y reconocen patrones, mediante los cuales SVM intenta representar los datos de entrada cono puntos en el espacio, para que los datos de cada categoría queden claramente separados.
 
@@ -20,8 +20,8 @@ Hicimos varias pruebas sobre este algoritmo, pero no tuvimos mucho exito - la im
 
 % subsection support_vector_machine (end)
 
-\subsection{Predicción sin algoritmo} % (fold)
-\label{sub:prediccion_sin_algoritmo}
+\subsubsection{Predicción sin algoritmo} % (fold)
+\label{ssub:prediccion_sin_algoritmo}
 
 La predicción sin algoritmo tambien es un enfoque posible - y es bastante sencillo, es el camino que tomamos al principio para entender mejor de que se trata la competencia. La idea es realizar una predicción basada en estadísticas y promedios del set de entrenamiento. Por ejemplo, asumir que la probabilidad de cada crimen de una fila del set de prueba es igual al procentaje de cada crímen en el distrito de esa fila. Ese porcentaje es calculado anteriormente sobre el set de entrenamiento - basicamente es el total de tipo de crímen sobre el total de crimenes en el distrito. Es interesante que este método, solo con el distrito, recibió un \textit{logloss} de 2.65400 en Kaggle.
 
