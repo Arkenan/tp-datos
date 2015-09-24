@@ -120,7 +120,7 @@ En su forma vectorial, el descenso por el gradiente podría verse con la siguien
 \end{equation}
 
 \subsubsection{Feature Scaling}
-Una mejora muy grande que se le puede hacer al descenso por el gradiente es la normalización o escalado de las variables de entrada (features). El problema que ataca es la diferencia entre los rangos de valores posibles de las features. 
+Una mejora muy grande que se le puede hacer al descenso por el gradiente es la normalización o escalado de las variables de entrada (features). El problema que ataca es la diferencia entre los rangos de valores posibles de las features.
 
 Por ejemplo, una variable puede ser la cantidad de cuartos que tiene una casa y otro la cantidad de metros cuadrados que tiene. Mientras uno se mueve entre 1 y 10 aproximadamente, el otro seguro será 10 veces más grande. Otros más comunes son, por ejemplo, la calificación del 1 al 5 de una película contra la cantidad de vistas que tiene, que pueden ser millones. Este desequilibrio produce, en gráficos como la figura \ref{fig:coordinateDescent}, que se haga cada vez más ovalado, y por lo tanto el paso $\alpha$ que tiene que dar en cada iteración para que no haya divergencia tiene que ser menor. Esto hace que sea más difícil de debuggear y que la convergencia, debido al paso más chico, sea mucho más lenta.
 
@@ -170,5 +170,5 @@ Este algoritmo será útil también en las redes neuronales, que utilizan descen
 \subsubsection{Entrega en Kaggle}
 En particular, con una implementación rudimentaria en python utilizando solo el distrito y features basados en la fecha, sin ninguna de todas las mejoras aquí planteadas, se obtuvo un puntaje de 2.59489.
 
-Aplicando este algoritmo sobre el set de prueba se obtenían predicciones de precisión muy similar al set de entrenamiento, que rondaba el 22\% de acertadas.
+Aplicando este algoritmo sobre un subset de entrenamiento como prueba se obtenían predicciones de precisión muy similar al set de entrenamiento, que rondaba el 22\% de acertadas.
 \input{./partes/redes.tex}

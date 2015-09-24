@@ -7,9 +7,18 @@
 
 Este algoritmo, conocido en castellano como ``Selvas Aleatorias'' es un algoritmo de ensamblado que combina varios algoritmos \textit{debiles} (por si solos no logran una clasificación eficiente) para construir un resultado mejor. Random Forest consta de varios arboles de predicción que se entrenan de forma independiente, cada uno con un subset de features de los datos de entrada - de esta manera se obtiene una colección de arboles no correlacionados. Para obtener la predicción final, los resultados de cada arbol se promedian. Para obtener resultados se le pueden variar la cantidad de arboles a usar, la cantidad de features por arbol (suele ser bastante más chica que la cantidad de features total, como la raiz cuadrada de ella, por ejemplo) y la profundidad de cada arbol.
 
-El concepto es interesante, pero su aplicación con nuestro set falló en la práctica. Hemos hecho pruebas con las implementaciones de Random Forest de \textbf{scikit}. Dió excelentes resultados sobre el set de entrenamiento, primero entrenado, y luego con las predicciones sobre subsets de los datos de entrenamiento se obtiene un score mayor a 90\% y un \textit{logloss} de \~0.4. Pero se equivoca mucho sobre los datos que no conoce - al entrenarlo con un subset de entrenamiento y probarlo con otro subset, el score se vuelve muy bajo y el \textit{logloss} altisimo. La submisión a Kaggle nos resultó en un \textit{logloss} de 19.25726. Cabe destacar que solo lo hemos probado 1 vez, con 10 arboles y sin limitarle la profundidad a cada arbol - tendríamos que hacer pruebas variando esos parametros. Acá nos enfrentamos con otro problema - la implemetación de \textit{scikit} de RandomForest consume demasiada memoria RAM - dicho entrenamiento y posterior predicción usaron los 6GB de una notebook. Por otro lado, la aplicación fue muy rápida, tardando unos pocos minutos.
+El concepto es interesante, pero su aplicación con nuestro set falló en la práctica. Hemos hecho pruebas con las implementaciones de Random Forest de \textbf{scikit}. Dió excelentes resultados sobre el set de entrenamiento, primero entrenado, y luego con las predicciones sobre subsets de los datos de entrenamiento se obtiene un score mayor a 90\% y un \textit{logloss} de \~0.4. Pero se equivoca mucho sobre los datos que no conoce - al entrenarlo con un subset de entrenamiento y probarlo con otro subset, el score se vuelve muy bajo y el \textit{logloss} altisimo. La submisión a Kaggle nos resultó en un \textit{logloss} de 19.25726, usando como features el distrito, los días de semana, la hora, el mes y el año. Cabe destacar que solo lo hemos probado 1 vez, con 10 arboles y sin limitarle la profundidad a cada arbol - tendríamos que hacer pruebas variando esos parametros. Acá nos enfrentamos con otro problema - la implemetación de \textit{scikit} de RandomForest consume demasiada memoria RAM - dicho entrenamiento y posterior predicción usaron los 6GB de una notebook. Por otro lado, la aplicación fue muy rápida, tardando unos pocos minutos.
 
 % subsubsection random_forest (end)
+
+\subsection{Support Vector Machine} % (fold)
+\label{sub:support_vector_machine}
+
+El método conocido bajo este nombre es un modelo para aprendizaje supervisado. Este modelo tiene algoritmos asociados, que reconocen analizan los datos y reconocen patrones, mediante los cuales SVM intenta representar los datos de entrada cono puntos en el espacio, para que los datos de cada categoría queden claramente separados.
+
+Hicimos varias pruebas sobre este algoritmo, pero no tuvimos mucho exito - la implementación de scikit (y SVM en general) no está preparada para clasificar nuestra cantidad de datos. Con tan solo un subset de 40000 ejemplos el algoritmo tardaba en aprender varios minutos.
+
+% subsection support_vector_machine (end)
 
 \subsection{Predicción sin algoritmo} % (fold)
 \label{sub:prediccion_sin_algoritmo}
