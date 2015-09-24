@@ -2,34 +2,72 @@
 \section{Tratamiento de datos} % (fold)
 \label{sec:tratamiento_de_datos}
 
-
-El set de datos proporcionado en su estado inicial no sirve para aplicarle los algoritmos típicos de machine learning: contiene datos que un algortimo matemático no tiene una forma de interpretar práctica.
-
-\begin{table}
+\begin{table}[!htbp]
 \centering
 \resizebox{\textwidth}{!}{
 
 \begin{tabular}{lllllllrr}
 \toprule
-               Dates &         Category &                                           Descript &  DayOfWeek &  PdDistrict &                        Resolution &                      Address &         X &         Y \\
+               Dates &        Category &     Descript &  DayOfWeek & PdDistrict &      Resolution &                  Address &           X &          Y \\
 \midrule
- 2005-11-16 10:00:00 &    LARCENY/THEFT &                       GRAND THEFT FROM LOCKED AUTO &  Wednesday &    NORTHERN &                              NONE &    1500 Block of FILLMORE ST & -0.400142 &  0.694857 \\
- 2013-04-17 10:55:00 &   OTHER OFFENSES &  RESTRAINING ORDER NOTIFICATION/SERVICE OF REST... &  Wednesday &     MISSION &  COMPLAINANT REFUSES TO PROSECUTE &     500 Block of VALENCIA ST &  0.035068 & -0.121903 \\
- 2014-11-16 13:43:00 &  STOLEN PROPERTY &  STOLEN PROPERTY, POSSESSION WITH KNOWLEDGE, RE... &     Sunday &  TENDERLOIN &                    ARREST, BOOKED &     100 Block of OFARRELL ST &  0.613777 &  0.808212 \\
- 2010-07-18 12:45:00 &            FRAUD &                          SHORT CHANGE, PETTY THEFT &     Sunday &        PARK &                              NONE &   500 Block of DIVISADERO ST & -0.586468 &  0.311033 \\
- 2005-07-26 23:00:00 &     NON-CRIMINAL &                       AIDED CASE, MENTAL DISTURBED &    Tuesday &     TARAVAL &                 PSYCHOPATHIC CASE &     3100 Block of TARAVAL ST & -3.047246 & -1.034459 \\
- 2012-03-06 08:05:00 &    LARCENY/THEFT &                     PETTY THEFT FROM UNLOCKED AUTO &    Tuesday &   INGLESIDE &                              NONE &    900 Block of ELLSWORTH ST &  0.247018 & -1.408019 \\
- 2011-04-06 19:00:00 &    LARCENY/THEFT &                       GRAND THEFT FROM LOCKED AUTO &  Wednesday &    NORTHERN &                              NONE &       FRANKLIN ST / GEARY BL & -0.010599 &  0.763399 \\
- 2011-06-27 22:45:00 &   OTHER OFFENSES &                                         CONSPIRACY &     Monday &     MISSION &                    ARREST, BOOKED &        3900 Block of 18TH ST & -0.353849 & -0.243859 \\
- 2006-03-21 18:48:00 &    LARCENY/THEFT &                            PETTY THEFT SHOPLIFTING &    Tuesday &    SOUTHERN &                    ARREST, BOOKED &       800 Block of MARKET ST &  0.598375 &  0.709911 \\
- 2010-01-27 09:30:00 &    DRUG/NARCOTIC &                          SALE OF BASE/ROCK COCAINE &  Wednesday &  TENDERLOIN &                    ARREST, BOOKED &  0 Block of UNITEDNATIONS PZ &  0.334233 &  0.529671 \\
+ 2008-04-15 18:30:00 &   DRUG/NARCOTIC &  POSSESSI... &    Tuesday &       PARK &  JUVENILE CITED &  700 Block of STANYAN ST & -122.453513 &  37.768697 \\
+ 2011-08-25 18:33:00 &        WARRANTS &  WARRANT ... &   Thursday &   SOUTHERN &  ARREST, BOOKED &   900 Block of MARKET ST & -122.408421 &  37.783570 \\
+ 2007-09-09 02:32:00 &     DRUNKENNESS &  UNDER IN... &     Sunday &   SOUTHERN &  ARREST, BOOKED &  1400 Block of FOLSOM ST & -122.413772 &  37.772142 \\
+ 2012-09-08 23:59:00 &   LARCENY/THEFT &  GRAND TH... &   Saturday &  INGLESIDE &            NONE &   100 Block of EMMETT CT & -122.416079 &  37.747295 \\
+ 2004-03-17 16:00:00 &   LARCENY/THEFT &  GRAND TH... &  Wednesday &   SOUTHERN &            NONE &   CLEMENTINA ST / 5TH ST & -122.403924 &  37.780699 \\
+ 2014-06-01 00:20:00 &        BURGLARY &  BURGLARY... &     Sunday &   NORTHERN &            NONE &  1300 Block of SUTTER ST & -122.422586 &  37.787387 \\
+ 2008-07-10 18:15:00 &  OTHER OFFENSES &  DRIVERS ... &   Thursday &   SOUTHERN &   ARREST, CITED &     HARRISON ST / 1ST ST & -122.392941 &  37.786068 \\
+ 2003-05-13 12:00:00 &   LARCENY/THEFT &  PETTY TH... &    Tuesday &   NORTHERN &            NONE &  0 Block of CERVANTES BL & -122.438303 &  37.803634 \\
+ 2013-04-07 19:00:00 &    NON-CRIMINAL &  FOUND PR... &     Sunday &   SOUTHERN &            NONE &     300 Block of 10TH ST & -122.412410 &  37.772404 \\
+ 2014-06-25 22:15:00 &   LARCENY/THEFT &  GRAND TH... &  Wednesday &   SOUTHERN &            NONE &      FOLSOM ST / 10TH ST & -122.412827 &  37.772812 \\
 \bottomrule
 \end{tabular}
+
 
 }
 \caption{Algunos datos aleatorios del set de entrenamiento}
 \end{table}
 
+\subsection{Explorando el set de datos} % (fold)
+\label{sub:explorando_el_set_de_datos}
 
+Los sets de datos son extensos. Para darnos una ídea de como están compuestos podemos tomar una muestra, y analizarla. Cada fila del set representa un crímen. Las filas vienen con una fecha completa, el distrito donde pasó el crímen, el día de semana, la dirección, la latitud y la longitud exactas. El set de entrenamiento también viene con el tipo de cada crímen (los que justamente necesitamos deducir sobre el set de prueba), y con una descripción y resolución de cada crímen. Estos últimos dos no nos interesan, ya que no aparecen en el set de prueba y, por ende, no podrémos tomar ninguna decisión en base a ellos.
+
+Pero para entender mejor el set de datos, lo graficaremos. Teniendo, por ejemplo, el gráfico de categorías~\ref{fig:categories} ya podemos hacer deducciones sobre neustro set de entrenamiento. Es muy visible que los crímenes no están uniformemente distribuidos, por ende lo más probable es que en la deducción casi siempre vamos a tender a darle más probabilidad a \textit{LARENCY/THEFT} o \textit{OTHER OFFENSES}.
+
+\begin{figure}[H]
+\includegraphics[width=130mm]{categories}
+\caption{Cantidad de crímenes de cada tipo.}
+\label{fig:categories}
+\end{figure}
+
+% subsection explorando_el_set_de_datos (end)
+
+\subsection{Deduciendo features} % (fold)
+\label{sub:deduciendo_features}
+
+Como parte de preprocesamiento, necesitaremos deducir cuales son los datos importantes para nosotros, es decir cuales son los datos que van a ayudar a que nuestro algoritmo aprenda más eficientemente y prediga mejor. Esos datos se pueden encontrar directamente en el set de datos tal como está o pueden necesitar algún procesamiento previo. Algunos inclusive pueden ser combinación de varios datos de una fila.
+
+Los únicos datos discretos, que sirven directamente son el distrito y el día de semana. La fecha tal como viene no tiene valor: cada crímen tiene una fecha única y lo más probable es que en el set de prueba tampoco se repita. Necesitamos procesar esa fecha primero.
+
+\begin{figure}[H]
+\includegraphics[width=160mm]{hours}
+\caption{Cantidad de crímenes por hora.}
+\label{fig:hours}
+\end{figure}
+
+Fecha es un dato muy útil, algunos features resultantes del procesamiento de ella que vienen inmediatamente a la mente son: la hora, el mes, el año. Pero podemos sacar otros features no menores, por ejemplo deducir si era verano o invierno, si era de día o de noche (inclusive variar el rango de día y de noche según estación, siendo que en invierno oscurece más temprano). Sí observamos el gráfico~\ref{fig:hours}, podemos detectar que entre la una y las siete la cantidad de crímenes baja notablemente y, por lo contrario, hay dos picos a las 12 y a las 18. Todos esos datos se pueden convertir en features para nuestro algoritmo. También podemos sacar el dato sobre el día de semana de la fecha - de esta forma la columna con el día de semana en los sets es, en realidad, reduntante. Si podemos conseguir datos externos, podríamos que fechas fueron feriado.
+
+
+
+
+% subsection deduciendo_features (end)
+
+
+\subsection{Transformando datos} % (fold)
+\label{sub:transformando_datos}
+
+% subsection transformando_datos (end)
+El set de datos proporcionado en su estado inicial no sirve para aplicarle los algoritmos típicos de machine learning: contiene datos que un algortimo matemático no tiene una forma de interpretar práctica.
 
 % section tratamiento_de_datos (end)
