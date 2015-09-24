@@ -156,3 +156,5 @@ Siendo $\frac{\partial J_{BP}^{(ej)}}{\partial \Theta_{ij}^{(l)}}$ la derivada p
 
 \subsubsection{Método de ajuste}
 Para la red en sí, la arquitectura inicial pensada es una capa oculta, con 2 o 3 veces la cantidad de nodos respecto de la capa de input. Después de lograr estabilizar el $\lambda$ de la regularización y el $\alpha$ del descenso por el gradiente, el plan es agregar una o dos capas ocultas más de la misma cantidad de nodos y evaluar el desempeño en el cross validation set (la parte separada del training set para hacer pruebas).
+
+Para asegurarse de que las derivadas están siendo correctamente calculadas por el backpropagation se utilizará gradient-checkin, un método para obtener una aproximación numérica del gradiente para tener algo con qué comparar. Si bien no será una buena aproximación, diferencias muy grandes, como cambios de signo u órdenes de magnitud, indican que errores de implementación del backpropagation.
