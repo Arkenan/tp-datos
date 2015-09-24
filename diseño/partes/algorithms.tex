@@ -165,4 +165,10 @@ Esto último se hace para cada uno de los ejemplos y luego se vuelve a comenzar 
 
 Una variante de este método es una mezcla entre el descenso por el gradiente en tanda y estocástico, que agarra pequeñas tandas, de por ejemplo, 10 casos de entrenamiento cada una. Esto permite aprovechar las ventajas de vectorizar las cuentas que provee la versión en tanda y la ventaja de no tardar tanto tiempo hasta hacer un paso que provee la implementación estocástica.
 
+Este algoritmo será útil también en las redes neuronales, que utilizan descenso por el gradiente.
+
+\subsubsection{Entrega en Kaggle}
+En particular, con una implementación rudimentaria en python utilizando solo el distrito y features basados en la fecha, sin ninguna de todas las mejoras aquí planteadas, se obtuvo un puntaje de 2.59489.
+
+Aplicando este algoritmo sobre el set de prueba se obtenían predicciones de precisión muy similar al set de entrenamiento, que rondaba el 22\% de acertadas.
 \input{./partes/redes.tex}
