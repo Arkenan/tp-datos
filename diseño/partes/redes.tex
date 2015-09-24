@@ -135,3 +135,24 @@ Resumiendo los pasos:
 \paragraph{Bias} Al igual que en la regresión logística se añadía un término independiente a la combinación lineal, en las redes neuronales se añade en cada capa una neurona que tiene siempre activación (salida) 1. Esto no afecta las cuentas hechas atrás. Lo único que cambia es el tamaño de las matrices $\Theta$, que tendrán una columna más para cada capa.
 
 \paragraph{Regularización} También, como ya veníamos haciendo, para evitar el overfitting, habrá una penalización en el costo para los valores de parámetros muy altos.
+El costo con regularización es el siguiente:
+
+\begin{equation}
+J(\Theta) = -\frac{1}{m} \left[ \sum_{i = 1}^{m}\sum_{k = 1}^{K} y_k^{(i)}log(h_\Theta(x^{(i)})_k) + (1-y_k^{(i)})(1-log(h_\Theta(x^{(i)})_k)) \right] + \frac{\lambda}{2m}\sum_{l = 1}^{L}\sum_{j=1}^{s_l}\sum_{i=1}^{s_{l+1}}(\Theta_{ij}^{(l)})^2
+\end{equation}
+
+Como el término que se agrega está sumado al costo anterior, el backpropagation planteado sirve, en tanto y en cuando se le agregue la derivada del costo por regularización. Algo a destacar es que los índices parten del 1 y no del 0 para i ya que no se regularizan los parámetros de bias. Quedará entonces:
+
+\begin{equation}
+\frac{\partial J(\Theta)}{\partial \Theta_{ij}^{(l)}} = \frac{1}{m}\sum_{ej = 1}^{m} \frac{\partial J_{BP}^{(ej)}}{\partial \Theta_{ij}^{(l)}} + \frac{\lambda}{m}\Theta_{ij}^{(l)} \qquad \text{para}\qquad j \neq 0
+\end{equation}
+\begin{equation}
+\frac{\partial J(\Theta)}{\partial \Theta_{ij}^{(l)}} = \frac{1}{m}\sum_{ej = 1}^{m} \frac{\partial J_{BP}^{(ej)}}{\partial \Theta_{ij}^{(l)}} \qquad \text{para}\qquad j = 0
+\end{equation}
+
+Siendo $\frac{\partial J_{BP}^{(ej)}}{\partial \Theta_{ij}^{(l)}}$ la derivada parcial individual del costo para el ejemplo $ej$ respecto del parámetro correspondiente utilizando backpropagation.
+
+\
+
+\subsubsection{Método de ajuste}
+Para la red en sí, la arquitectura inicial pensada es una capa oculta, con 2 o 3 veces la cantidad de nodos respecto de la capa de input. Después de lograr estabilizar el $\lambda$ de la regularización y el $\alpha$ del descenso por el gradiente, el plan es agregar una o dos capas ocultas más de la misma cantidad de nodos y evaluar el desempeño en el cross validation set (la parte separada del training set para hacer pruebas).
