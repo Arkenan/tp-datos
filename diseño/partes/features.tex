@@ -31,7 +31,7 @@
 \subsection{Explorando el set de datos} % (fold)
 \label{sub:explorando_el_set_de_datos}
 
-Los sets de datos son extensos. Para darnos una ídea de como están compuestos podemos tomar una muestra, y analizarla. Cada fila del set representa un crímen. Las filas vienen con una fecha completa, el distrito donde pasó el crímen, el día de semana, la dirección, la latitud y la longitud exactas. El set de entrenamiento también viene con el tipo de cada crímen (los que justamente necesitamos deducir sobre el set de prueba), y con una descripción y resolución de cada crímen. Estos últimos dos no nos interesan, ya que no aparecen en el set de prueba y, por ende, no podrémos tomar ninguna decisión en base a ellos.
+Los sets de datos son extensos. Para darnos una idea de como están compuestos podemos tomar una muestra, y analizarla. Cada fila del set representa un crimen. Las filas vienen con una fecha completa, el distrito donde pasó el crimen, el día de semana, la dirección, la latitud y la longitud exactas. El set de entrenamiento también viene con el tipo de cada crimen (los que justamente necesitamos deducir sobre el set de prueba), y con una descripción y resolución de cada crimen. Estos últimos dos no nos interesan, ya que no aparecen en el set de prueba y, por ende, no podremos tomar ninguna decisión en base a ellos.
 
 Pero para entender mejor el set de datos, lo graficaremos. Teniendo, por ejemplo, el gráfico de categorías~\ref{fig:categories} ya podemos hacer deducciones sobre neustro set de entrenamiento. Es muy visible que los crímenes no están uniformemente distribuidos, por ende lo más probable es que en la deducción casi siempre vamos a tender a darle más probabilidad a \textit{LARENCY/THEFT} o \textit{OTHER OFFENSES}.
 
@@ -46,9 +46,9 @@ Pero para entender mejor el set de datos, lo graficaremos. Teniendo, por ejemplo
 \subsection{Deduciendo features} % (fold)
 \label{sub:deduciendo_features}
 
-Como parte de preprocesamiento, necesitaremos deducir cuales son los datos importantes para nosotros, es decir cuales son los datos que van a ayudar a que nuestro algoritmo aprenda más eficientemente y prediga mejor. Esos datos se pueden encontrar directamente en el set de datos tal como está o pueden necesitar algún procesamiento previo. Algunos inclusive pueden ser combinación de varios datos de una fila.
+Como parte de preprocesamiento, necesitaremos deducir cuáles son los datos importantes para nosotros, es decir cuáles son los datos que van a ayudar a que nuestro algoritmo aprenda más eficientemente y prediga mejor. Esos datos se pueden encontrar directamente en el set de datos tal como está o pueden necesitar algún procesamiento previo. Algunos inclusive pueden ser combinación de varios datos de una fila.
 
-Los únicos datos discretos, que sirven directamente son el distrito y el día de semana. La fecha tal como viene no tiene valor: cada crímen tiene una fecha única y lo más probable es que en el set de prueba tampoco se repita. Necesitamos procesar esa fecha primero.
+Los únicos datos discretos, que sirven directamente son el distrito y el día de semana. La fecha tal como viene no tiene valor: cada crimen tiene una fecha única y lo más probable es que en el set de prueba tampoco se repita. Necesitamos procesar esa fecha primero.
 
 \begin{figure}[H]
 \includegraphics[width=160mm]{hours}
@@ -56,7 +56,7 @@ Los únicos datos discretos, que sirven directamente son el distrito y el día d
 \label{fig:hours}
 \end{figure}
 
-Fecha es un dato muy útil, algunos features resultantes del procesamiento de ella que vienen inmediatamente a la mente son: la hora, el mes, el año. Pero podemos sacar otros features no menores, por ejemplo deducir si era verano o invierno, si era de día o de noche (inclusive variar el rango de día y de noche según estación, siendo que en invierno oscurece más temprano). Sí observamos el gráfico~\ref{fig:hours}, podemos detectar que entre la una y las siete la cantidad de crímenes baja notablemente y, por lo contrario, hay dos picos a las 12 y a las 18. Todos esos datos se pueden convertir en features para nuestro algoritmo. También podemos sacar el dato sobre el día de semana de la fecha - de esta forma la columna con el día de semana en los sets es, en realidad, reduntante. Si podemos conseguir datos externos, podríamos que fechas fueron feriado.
+Fecha es un dato muy útil, algunos features resultantes del procesamiento de ella que vienen inmediatamente a la mente son: la hora, el mes, el año. Pero podemos sacar otros features no menores, por ejemplo deducir si era verano o invierno, si era de día o de noche (inclusive variar el rango de día y de noche según estación, siendo que en invierno oscurece más temprano). Sí observamos el gráfico~\ref{fig:hours}, podemos detectar que entre la una y las siete la cantidad de crímenes baja notablemente y, por lo contrario, hay dos picos a las 12 y a las 18. Todos esos datos se pueden convertir en features para nuestro algoritmo. También podemos sacar el dato sobre el día de semana de la fecha - de esta forma la columna con el día de semana en los sets es, en realidad, redundante. Si podemos conseguir datos externos, podríamos que fechas fueron feriado.
 
 
 
@@ -68,6 +68,6 @@ Fecha es un dato muy útil, algunos features resultantes del procesamiento de el
 \label{sub:transformando_datos}
 
 % subsection transformando_datos (end)
-El set de datos proporcionado en su estado inicial no sirve para aplicarle los algoritmos típicos de machine learning: contiene datos que un algortimo matemático no tiene una forma de interpretar práctica.
+El set de datos proporcionado en su estado inicial no sirve para aplicarle los algoritmos típicos de machine learning: contiene datos que un algoritmo matemático no tiene una forma de interpretar práctica.
 
 % section tratamiento_de_datos (end)
