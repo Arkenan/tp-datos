@@ -9,7 +9,7 @@ La regresión logística a pesar de su nombre es un algoritmo de clasificación,
 
 El modelo de la regresión logística es análogo al de la regresión lineal, dado que tal como la misma, parte de una función hipótesis que se le aplica a los datos de entrada.
 \begin{equation}
-h_{\theta}(x)= \Theta^T \cdot x
+h_{\theta}(x)= \theta^T \cdot x
 \end{equation}
 \begin{small}
 Esta es la representación vectorial de la función hipótesis de la regresión lineal. Donde $X$ es el vector traspuesto de datos $x_{i}$, y $\Theta^T$ es el vector de pesos $\theta_{j}$.
@@ -20,7 +20,7 @@ En el caso de la regresión lineal, el valor de retorno de la función hipótesi
 \subsubsection{Función sigmoidal.}
 En el caso particular de la regresión logística, la función hipótesis se construye de la siguiente manera:
 \begin{equation}
-h_{\theta}(x)= \frac{1}{1+e^{- \Theta^T\cdot x }}
+h_{\theta}(x)= \frac{1}{1+e^{- \theta^T\cdot x }}
 \end{equation}
 
 Similarmente, la hipótesis de la regresión logística utiliza el vector de datos de entrada $X$ y el de pesos $\Theta$, y su función retorna un valor escalar. Sin embargo, esta nueva función otorga una ventaja al retornar un número escalar real comprendido entre 1 y 0. Este tipo de función se llama función sigmoidal, y el valor escalar comprendido entre 1 y 0 se puede interpretar como una probabilidad.
@@ -87,15 +87,15 @@ Esto ocurre gracias a que las funciones logarítmicas de cada caso se comportan 
 Análogamente, se pueden definir funciones de costo de forma contínua, obteniendo comportamientos similares. En el caso particular de la clase LogisticRegression implementada en el paquete de python \textit{sklearn}, una función de costo utilizada es la siguiente:
 
 \begin{equation}
-J(\theta,c)= \Theta^T \cdot \Theta + C \sum_{i=1}^n \log (e^{-y_{i} \cdot (X_{i}^T \Theta + c)})
+J(\theta,c)= \theta^T \cdot \theta + C \sum_{i=1}^n \log (e^{-y_{i} \cdot (X_{i}^T \theta + c)})
 \end{equation}
 Donde:
 
 \begin{itemize}
   \item $X_{i}$ es el vector de parámetros de entrada del i-ésimo caso de un set de entrenamiento.
   \item $y_{i}$ es el valor correcto conocido del i-ésimo caso de un set de entrenamiento.
-  \item $c$ es una constante de ajuste, al igual que los pesos comprendidos en el vector $\Theta$.
-  \item $\Theta^T \cdot \Theta$ y $C$ son complementos de la función de costo pensados para regularizarla, suavizando su comportamiento con el fin de evitar cometer \textit{overfitting}.
+  \item $c$ es una constante de ajuste, al igual que los pesos comprendidos en el vector $\theta$.
+  \item $\theta^T \cdot \theta$ y $C$ son complementos de la función de costo pensados para regularizarla, suavizando su comportamiento con el fin de evitar cometer \textit{overfitting}.
 \end{itemize}
 
 \subsubsection{Optimización: descenso por el gradiente.}
@@ -114,6 +114,40 @@ A continuación se muestra una gráfica que ilustra este método de optimizació
 \label{fig:coordinateDescent}
 \end{figure}
 
+En su forma vectorial, el descenso por el gradiente podría verse con la siguiente fórmula de actualización:
+\begin{equation}
+\theta := \theta - \alpha \nabla J
+\end{equation}
 
+\subsubsection{Feature Scaling}
+Una mejora muy grande que se le puede hacer al descenso por el gradiente es la normalización o escalado de las variables de entrada (features). El problema que ataca es la diferencia entre los rangos de valores posibles de las features. 
 
+Por ejemplo, una variable puede ser la cantidad de cuartos que tiene una casa y otro la cantidad de metros cuadrados que tiene. Mientras uno se mueve entre 1 y 10 aproximadamente, el otro seguro será 10 veces más grande. Otros más comunes son, por ejemplo, la calificación del 1 al 5 de una película contra la cantidad de vistas que tiene, que pueden ser millones. Este desequilibrio produce, en gráficos como la figura \ref{fig:coordinateDescent}, que se haga cada vez más ovalado, y por lo tanto el paso $\alpha$ que tiene que dar en cada iteración para que no haya divergencia tiene que ser menor. Esto hace que sea más difícil de debuggear y que la convergencia, debido al paso más chico, sea mucho más lenta.
+
+El feature scaling consiste en pasar todas las variables a intervalos aproximadamente entre 0 y 1 y luego entrenar $\theta$ sobre esas nuevas features normalizadas. El scaling se hace de la siguiente manera:
+
+\begin{equation}
+x_i := \frac{x_i - \mu_{x_i}}{\sigma_{x_i}}
+\end{equation}
+
+Al quitarle el valor medio y dividir por la desviación estandar, todas las variables quedan en rangos similares y el descenso por el gradiente puede hacerse de forma más segura y rápida.
+
+Para poner un ejemplo concreto, probando un ajuste de parábolas por regresión lineal, sin escalamiento de variables requería un $\alpha$ más pequeño que 0.0001 para converger y por lo tanto miles de iteraciones. Por otro lado, escalando las variables, había convergencia con un paso de 1.0 y en algunas decenas de iteraciones ya se conseguían errores menores a $10^{-15}$.
+
+\subsubsection{Regularización}
+Como fue mencionada antes, la regularización es una medida que se toma en contra del overfitting. El overfitting, o sobreajuste, es un problema que consiste en que el algoritmo predictor quede muy bien entrenado para el predecir dentro del set de entrenamiento, pero no tenga capacidad de generalizar. Esto suele ocurrir cuando se modela un problema con una complejidad mayor a la que le corresponde, o cuando faltan ejemplos para la cantidad de features que se proponen.
+
+A veces quitar features no es una opción. Sin embargo, si se puede penalizar darle mucha importancia a todos los features a la vez. Esta penalización se hace a través del costo y se llama regularización:
+
+\begin{equation}
+J(\theta) = -\frac{1}{m}\sum_{i = 1}^{m}\left[y^{(i)}(log(h_\theta(x^{(i)}))) + (1-y^{(i)})log(1-h_\theta(x^{(i)}))\right] + \frac{1}{m}\sum_{j = 1}^{n}\theta_j^2
+\end{equation}
+Y en forma vectorial:
+\begin{equation}
+J(\theta) = \frac{1}{m}\left[ -y^Tlog(h_\theta(x)) - (1-y)^Tlog(1-h_\theta(x)) + \theta^T\theta\right]
+\end{equation}
+
+De todos modos hay que tener en cuenta que no se regulariza el parámetro del término independiente, con lo cual en el término de la derecha deben extraerse primero los $\theta_0$.
+
+\subsubsection{Stochastic Gradient Descent}
 \input{./partes/redes.tex}
