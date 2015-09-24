@@ -1,1 +1,59 @@
 \subsection{Redes Neuronales}
+Las redes neuronales son estructuras de predicción de propósito general, que se basan en unidades, llamadas \emph{neuronas}. Particularmente en este caso, vamos a usar una red neuronal para clasificación, y veremos como influye eso a la hora de construirla.
+
+Históricamente %Buscar referencia!
+surgieron de un acercamiento al aprendizaje automático que seguía como heurística conseguir un parecido entre la inteligencia artificial y el funcionamiento de la mente humana. Una red tiene capas de neuronas, cada una de las cuales obtiene con input una combinación lineal de los datos de la capa anterior. Cada neurona, a ese input, le aplica una \emph{función de activación}, que será su output.
+
+Para el caso de una sola neurona de clasificación, podemos comparar el comportamiento con el de una regresión logística:
+
+\begin{figure}[h]
+\centering
+\def\svgwidth{0.25\columnwidth}
+\caption{Neurona clasificadora}
+\input{./images/neurona.pdf_tex}
+\end{figure}
+
+En la figura se ve una capa $l$ (de "layer") con tres neuronas. Cada una tiene como output su función de activación $a$. La neurona de la capa siguiente toma como input una combinación lineal de las anteriores y le aplica su propia función de activación, la función sigmoidea.
+\begin{eqnarray}
+ h_{\theta} = g(z)  \\
+ z = \sum_{i = 1}^{3}\theta_i a_i^{(l)}=\theta^T a^{(l)}
+\end{eqnarray}
+De esta forma obtenemos la ya vista regresión logística.
+
+Una red neuronal es más general. Tiene una capa inicial, con los datos de entrada para la predicción, una capa de salida, con la hipótesis, y una cantidad arbitraria de capas llamadas \emph{ocultas} entre ellas. Estas últimas permiten que la hipótesis final sirva para modelar problemas muy complejos, ya que las activaciones de cada capa anterior actúan como nuevas features para las capas siguientes:
+
+\begin{figure}[h]
+\centering
+\def\svgwidth{0.25\columnwidth}
+\caption{Red Neuronal}
+\input{./images/red.pdf_tex}
+\end{figure}
+
+La red presentada en la figura, por ejemplo, tiene 3 capas. La de las features del ejemplo (input), una capa oculta (capa 2) y una capa de output, que es la que da como resultado la hipótesis. La necesidad de múltiples hipótesis corresponde a que la clasificación de crímenes es multiclase. Cada neurona del output dará como resultado la probabilidad de pertenencia del ejemplo a cada clase.
+
+\paragraph{FeedForward}
+El paso hacia adelante (obtención de la hipótesis según features) se hace repitiendo el esquema de la neurona única. La diferencia radica principalmente en que ahora en lugar de tener un vector $\theta$, como de las salidas de un una capa de neuronas obtenemos las entradas de la siguiente (de un vector obtenemos otro), necesitaremos en cada paso una matriz que llamaremos $\Theta^{(l)}$.
+
+Las capas se relacionan de la siguiente manera:
+\begin{eqnarray}
+\text{Activación: } \qquad a^{(l)} = g(z(l)) \\
+\text{Combinacion lineal: } \qquad z^{(l+1)} = \Theta^{(l)} a^{(l)}
+\end{eqnarray}
+Y particularmente para la red de arriba se cumple que
+\begin{eqnarray}
+a^{(1)} = x \\
+a^{(3)} = h_{\Theta}
+\end{eqnarray}
+\paragraph{Función de costo.} Como es un problema de clasificación, al igual que en un problema de regresión logística, se usa una función de costo logarítmica, pero se suma el costo para la probabilidad asignada a cada clase.
+
+\begin{equation}
+J(\Theta) = -{1}/{m} \left[ \sum_{i = 1}^{m}\sum_{k = 1}^{K} y_k^{(i)}log(h_\Theta(x^{(i)})_k) + (1-y_k^{(i)})(1-log(h_\Theta(x^{(i)})_k)) \right]
+\end{equation}
+siendo $m$ la cantidad de ejemplos y $K$ la cantidad de clases.
+
+Una observación importante es que el costo se puede obtener como un promedio de los costos individuales de cada ejemplo:
+\begin{equation}
+J(\Theta) = 1/m \sum_{i=1}^{m}J(\Theta)^{(i)}
+\end{equation}
+
+Una segunda observación es que basta conocer la salida de la última capa para poder obtener el costo de la predicción. Estas dos serán asunciones que tendremos que hacer más adelante para el algoritmo de \emph{Backpropagation}.
