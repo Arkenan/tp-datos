@@ -17,6 +17,7 @@ Esta es la representación vectorial de la función hipótesis de la regresión 
 
 En el caso de la regresión lineal, el valor de retorno de la función hipótesis puede variar mucho dependiendo del vector de datos de entrada $X$ y el vector de pesos $\Theta$. En este aspecto la regresión logística se diferencia de la regresión lineal.
 
+\paragraph{Función sigmoidal.}
 En el caso particular de la regresión logística, la función hipótesis se construye de la siguiente manera:
 \begin{equation}
 h_{\theta}(x)= \frac{1}{1+e^{- \Theta^T\cdot x }} 
@@ -30,6 +31,7 @@ Similarmente, la hipótesis de la regresión logística utiliza el vector de dat
 \label{fig:logisticCurve}
 \end{figure}
 
+\paragraph{Uno contra todos.}
 Sin embargo, hasta el momento el algoritmo parece ser sólo diseñado para resolver problemas de clasificación binaria. Para utilizar este algoritmo de forma pueda abordar un problema de salida multiclase, debe aplicarse algún esquema de clasificación que aproveche las salidas binarias (o de probabilidad entre 0 y 1) de la función sigmoidal. Para eso se utiliza el esquema \textit{ovr (One-vs-rest)}. One-vs-rest no aplica otra cosa que el criterio de \textit{dividir y conquistar}. Por cada clase se resuelve el problema en forma binaria, donde el caso positivo (1) corresponde a la clase misma, y el caso negativo corresponde a cualquier otra clase. A continuación puede verse una representación gráfica de esta estrategia:
 
 \begin{figure}[H]
@@ -39,7 +41,8 @@ Sin embargo, hasta el momento el algoritmo parece ser sólo diseñado para resol
 \label{fig:oneVsRest}
 \end{figure}
 
-De esta manera se obtiene una serie de funciones $h_{\theta}^k(x)$ donde $k$ es el número de la clase que representa la función. De esta forma se obtiene la probabilidad de cada clase distinta para el set de valores de entrada.
+\paragraph{Estimación y Función de Costo.}
+De esta manera se cuenta con una serie de funciones $h_{\theta}^k(x)$ donde $k$ es el número de la clase que representa la función. A través del valor de retorno de todas estas funciones se obtiene entonces la probabilidad de cada clase distinta para cada caso del set de valores de entrada.
 
 Este conjunto de probabilidades obtenido, es una estimación, y esa estimación debe aproximarse al valor deseado. En este trabajo disponemos de un set de entrenamiento asociado a las clasificaciones correctas. El objetivo de la regresión logística es esbozar una función de costo dados los pesos $\theta_{j}$ . De esta manera, optimizando (o minimizando) la función costo se pueden corregir los pesos $\theta_{j}$, de forma que las estimaciones posteriores se asemejen cada vez más a los valores deseados o ``correctos''. 
 
@@ -89,6 +92,7 @@ Donde:
   \item $\Theta^T \cdot \Theta$ y $C$ son complementos de la función de costo pensados para regularizarla, suavizando su comportamiento con el fin de evitar cometer \textit{overfitting}.
 \end{itemize}
 
+\paragraph{Optimización.} 
 Por último, queda detallar el método de optimización utilizado por la regresión logística. Los métodos de optimización de la función de costo pueden ser derivativos o no derivativos.
 
 El método derivativo clásico es el descenso por el gradiente. El descenso por el gradiente consiste en calcular el gradiente de la función costo. De esta forma se obtiene la dirección y sentido de máximo crecimiento de la función. Con el fin de minimizarla, lo que se hace es, a través de un escalar que se denomina \textit{paso} de la optimización, se van variando los valores de $\theta_{i}$ en la misma dirección y sentido opuesto que el gradiente, de forma de apuntar hacia la minimización de la función de costo. Esto se realiza iterativamente, recalculando el gradiente de la función costo con los parámetros $\theta_{i}$ actualizados.
@@ -103,5 +107,7 @@ A continuación se muestra una gráfica que ilustra este método de optimizació
 \caption{Descenso coordenado. Las elipses concéntricas son curvas de nivel, donde el centro de las elipses se encuentra un mínimo local. \cite{wikipediaCoordinateDescent}}
 \label{fig:coordinateDescent}
 \end{figure}
+
+
 
 \input{./partes/redes.tex}
