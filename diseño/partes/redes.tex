@@ -31,7 +31,7 @@ Una red neuronal es más general. Tiene una capa inicial, con los datos de entra
 
 La red presentada en la figura, por ejemplo, tiene 3 capas. La de las features del ejemplo (input), una capa oculta (capa 2) y una capa de output, que es la que da como resultado la hipótesis. La necesidad de múltiples hipótesis corresponde a que la clasificación de crímenes es multiclase. Cada neurona del output dará como resultado la probabilidad de pertenencia del ejemplo a cada clase.
 
-\paragraph{FeedForward}
+\subsubsection{FeedForward}
 El paso hacia adelante (obtención de la hipótesis según features) se hace repitiendo el esquema de la neurona única. La diferencia radica principalmente en que ahora en lugar de tener un vector $\theta$, como de las salidas de un una capa de neuronas obtenemos las entradas de la siguiente (de un vector obtenemos otro), necesitaremos en cada paso una matriz que llamaremos $\Theta^{(l)}$.
 
 Las capas se relacionan de la siguiente manera:
@@ -44,7 +44,7 @@ Y particularmente para la red de arriba se cumple que
 a^{(1)} = x \\
 a^{(3)} = h_{\Theta}
 \end{eqnarray}
-\paragraph{Función de costo} Como es un problema de clasificación, al igual que en un problema de regresión logística, se usa una función de costo logarítmica, pero se suma el costo para la probabilidad asignada a cada clase.
+\subsubsection{Función de costo} Como es un problema de clasificación, al igual que en un problema de regresión logística, se usa una función de costo logarítmica, pero se suma el costo para la probabilidad asignada a cada clase.
 
 \begin{equation}
 J(\Theta) = -{1}/{m} \left[ \sum_{i = 1}^{m}\sum_{k = 1}^{K} y_k^{(i)}log(h_\Theta(x^{(i)})_k) + (1-y_k^{(i)})(1-log(h_\Theta(x^{(i)})_k)) \right]
@@ -58,7 +58,7 @@ J(\Theta) = 1/m \sum_{i=1}^{m}J(\Theta)^{(i)}
 
 Una segunda observación es que basta conocer la salida de la última capa para poder obtener el costo de la predicción. Estas dos serán asunciones que tendremos que hacer más adelante para el algoritmo de \emph{Backpropagation}.
 
-\paragraph{Backpropagation} Como se desea hacer descenso por el gradiente para minimizar el costo, es necesario computar el gradiente de la función de costo según los parámetros $\Theta_{ij}^{(l)}$. Sin embargo, calcular manualmente las derivadas de la hipótesis en cuanto a los parámetros de todas las matrices se vuelve complicado por la cantidad de pasos intermedios que hay entre la primera y la última capa. Además, si así se calculara sería poco generalizable ya que dependería de la estructura de la red y de la cantidad de capas ocultas.
+\subsubsection{Backpropagation} Como se desea hacer descenso por el gradiente para minimizar el costo, es necesario computar el gradiente de la función de costo según los parámetros $\Theta_{ij}^{(l)}$. Sin embargo, calcular manualmente las derivadas de la hipótesis en cuanto a los parámetros de todas las matrices se vuelve complicado por la cantidad de pasos intermedios que hay entre la primera y la última capa. Además, si así se calculara sería poco generalizable ya que dependería de la estructura de la red y de la cantidad de capas ocultas.
 
 Para solucionar este problema surgió en los 70\cite{chap2} un algoritmo llamado \emph{backpropagation}, que permite calcular las derivadas parciales en función capa a capa, partiendo de los resultados. Recordando la primera observación sobre la función de costo, trabajaremos solo con el costo individual para un ejemplo, y para simplificar la notación, lo llamaremos simplemente $J$.
 
@@ -132,6 +132,29 @@ Resumiendo los pasos:
 	\end{enumerate}
 \end{description}
 
-\paragraph{Bias} Al igual que en la regresión logística se añadía un término independiente a la combinación lineal, en las redes neuronales se añade en cada capa una neurona que tiene siempre activación (salida) 1. Esto no afecta las cuentas hechas atrás. Lo único que cambia es el tamaño de las matrices $\Theta$, que tendrán una columna más para cada capa.
+\subsubsection{Bias} Al igual que en la regresión logística se añadía un término independiente a la combinación lineal, en las redes neuronales se añade en cada capa una neurona que tiene siempre activación (salida) 1. Esto no afecta las cuentas hechas atrás. Lo único que cambia es el tamaño de las matrices $\Theta$, que tendrán una columna más para cada capa.
 
-\paragraph{Regularización} También, como ya veníamos haciendo, para evitar el overfitting, habrá una penalización en el costo para los valores de parámetros muy altos.
+\subsubsection{Regularización} También, como ya veníamos haciendo, para evitar el overfitting, habrá una penalización en el costo para los valores de parámetros muy altos.
+El costo con regularización es el siguiente:
+
+\begin{equation}
+J(\Theta) = -\frac{1}{m} \left[ \sum_{i = 1}^{m}\sum_{k = 1}^{K} y_k^{(i)}log(h_\Theta(x^{(i)})_k) + (1-y_k^{(i)})(1-log(h_\Theta(x^{(i)})_k)) \right] + \frac{\lambda}{2m}\sum_{l = 1}^{L}\sum_{j=1}^{s_l}\sum_{i=1}^{s_{l+1}}(\Theta_{ij}^{(l)})^2
+\end{equation}
+
+Como el término que se agrega está sumado al costo anterior, el backpropagation planteado sirve, en tanto y en cuando se le agregue la derivada del costo por regularización. Algo a destacar es que los índices parten del 1 y no del 0 para i ya que no se regularizan los parámetros de bias. Quedará entonces:
+
+\begin{equation}
+\frac{\partial J(\Theta)}{\partial \Theta_{ij}^{(l)}} = \frac{1}{m}\sum_{ej = 1}^{m} \frac{\partial J_{BP}^{(ej)}}{\partial \Theta_{ij}^{(l)}} + \frac{\lambda}{m}\Theta_{ij}^{(l)} \qquad \text{para}\qquad j \neq 0
+\end{equation}
+\begin{equation}
+\frac{\partial J(\Theta)}{\partial \Theta_{ij}^{(l)}} = \frac{1}{m}\sum_{ej = 1}^{m} \frac{\partial J_{BP}^{(ej)}}{\partial \Theta_{ij}^{(l)}} \qquad \text{para}\qquad j = 0
+\end{equation}
+
+Siendo $\frac{\partial J_{BP}^{(ej)}}{\partial \Theta_{ij}^{(l)}}$ la derivada parcial individual del costo para el ejemplo $ej$ respecto del parámetro correspondiente utilizando backpropagation.
+
+\
+
+\subsubsection{Método de ajuste}
+Para la red en sí, la arquitectura inicial pensada es una capa oculta, con 2 o 3 veces la cantidad de nodos respecto de la capa de input. Después de lograr estabilizar el $\lambda$ de la regularización y el $\alpha$ del descenso por el gradiente, el plan es agregar una o dos capas ocultas más de la misma cantidad de nodos y evaluar el desempeño en el cross validation set (la parte separada del training set para hacer pruebas).
+
+Para asegurarse de que las derivadas están siendo correctamente calculadas por el backpropagation se utilizará gradient-checkin, un método para obtener una aproximación numérica del gradiente para tener algo con qué comparar. Si bien no será una buena aproximación, diferencias muy grandes, como cambios de signo u órdenes de magnitud, indican que errores de implementación del backpropagation.
