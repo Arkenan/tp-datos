@@ -62,8 +62,8 @@ vector<vector<string>> getLines(std::string filename) {
 }
 
 
-// Returns a map with categories as keys and their encodings as integer values
-map<string, int> getEncodedLabels(vector<vector<string>> vec) {
+// Returns a matrix with encoded category labels
+mat getEncodedLabels(vector<vector<string>> vec) {
   set<string> labels;
   for(auto &item : vec) {
     labels.insert(item[CATEGORY_COL]);
@@ -75,11 +75,18 @@ map<string, int> getEncodedLabels(vector<vector<string>> vec) {
     labelsMap.emplace(label, i);
     i++;
   }
-  return labelsMap;
+
+  mat labelsMat;
+  int counter = 0;
+  for(auto &item : vec) {
+    labelsMat(counter, 0) = labelsMap.at(item[CATEGORY_COL]);
+    counter++;
+  }
+  return labelsMat;
 }
 
-mat getFeatures(vector<vector<string>> vec, map<string, int> labelsMap) {
-  mat features(vec.size(), 5);
+mat getFeatures(vector<vector<string>> vec) {
+  mat features(vec.size(), 4);
 
   int counter = 0;
   for(auto &item : vec) {
@@ -95,7 +102,6 @@ mat getFeatures(vector<vector<string>> vec, map<string, int> labelsMap) {
     features(counter, 1) = month;
     features(counter, 2) = day;
     features(counter, 3) = hour;
-    features(counter, 4) = labelsMap.at(item[CATEGORY_COL]);
 
     counter++;
   }
@@ -113,13 +119,13 @@ int main(int argc, char const *argv[])
   printf("getLines: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
   tStart = clock();
 
-  map<string, int> labelsMap = getEncodedLabels(vec);
+  mat y_train = getEncodedLabels(vec);
 
-  mat train = getFeatures(vec, labelsMap);
+  mat X_train = getFeatures(vec);
 
   printf("getFeatures: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
-  train.save("foo.mat", csv_ascii);
+  // X_train.save("foo.mat", csv_ascii);
 
   for(auto &item : vec) {
     // copy(item.begin(), item.end(), ostream_iterator<string>(cout, "|"));
