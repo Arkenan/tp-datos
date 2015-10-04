@@ -1,6 +1,6 @@
 % Genera puntos en 3D en un cubo de lado 30. Genero 100 puntos.
-a = 0;
-
+nTrain = 800000;
+nPrueba = 1000;
 function [X, res] = generar(n)
 
     X = zeros(n,3);
@@ -22,9 +22,9 @@ function [X, res] = generar(n)
 endfunction
 
 % Entrenamiento.
-[X,res] = generar(50);
-csvwrite("trainingRegLog.csv",[X res]);
+[X,res] = generar(nTrain);
+csvwrite('trainingRegLog.csv',[X res]);
 
 % Para predecir.
-[X2,res2] = generar(20);
-csvwrite("adivinar.csv",[X2 res2]);
+[X2,res2] = generar(nPrueba);
+csvwrite('adivinar.csv',[X2 res2]);
