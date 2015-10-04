@@ -4,15 +4,33 @@
 using namespace std;
 using namespace arma;
 
+// Habría que ver cómo modularizo esto para no repetirlo...
+vec predecirSobreSet(vec theta, mat mu, mat sigma, mat ejs){
+	// Cambio features a cuadráticos.
+	ejs = pow(ejs,2);
+
+	// Normalizo.
+	for (u32 feat = 0; feat < ejs.n_cols ; feat++){
+		ejs.col(feat) = (ejs.col(feat) - mu(feat))/sigma(feat);
+	}
+
+	// Xgrego Bias
+	ejs = join_rows(vec(ejs.n_rows).fill(1.0),ejs);
+
+	return ejs*theta;
+}
+
+
 // Función sigmoidea.
 mat g(mat z){
 	return pow(1.0+exp(-z),-1);
 }
 
 int main(){
-	// Cargo los datos.
+	// Cargo los datos. Hay que ver si se puede
+	// trabajar sobre la misma matriz de datos en lugar de duplicar.
 	mat datos;
-	datos.load("trainingRed.csv");
+	datos.load("trainingRegLog.csv");
 
 	// Training Set.
 	mat X = datos.cols(span(0,2));
@@ -46,11 +64,19 @@ int main(){
 
 	// Gradient Descent para entrenar.
 	float alpha = 1;
-	for (int i = 1; i < 150; i++){
+	for (int i = 1; i < 500; i++){
 		theta = theta - (alpha/m)*g(X.t())*(X*theta-y);
 	}
 
 	theta.print("theta entrenado:");
+
+	// Empiezan las pruebas
+	mat datosCross;
+	datosCross.load("adivinar.csv");
+	mat predicciones = predecirSobreSet(theta,mu,sigma,datosCross.cols(span(0,2)));
+	predicciones.print("predicciones (probabilidades):");
+	mat errores = predicciones - datosCross.col(3);
+	errores.print("Errores de predicción:");
 
 	return 0;
 }
