@@ -23,8 +23,8 @@ endfunction
 
 % Entrenamiento.
 [X,res] = generar(nTrain);
-csvwrite("trainingRegLog.csv",[X res]);
+csvwrite('trainingRegLog.csv',[X res]);
 
 % Para predecir.
 [X2,res2] = generar(nPrueba);
-csvwrite("adivinar.csv",[X2 res2]);
+csvwrite('adivinar.csv',[X2 res2]);
