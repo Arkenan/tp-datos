@@ -22,7 +22,6 @@ using namespace boost;
 int DATES_COL = 0;
 int CATEGORY_COL = 1;
 
-
 vector<vector<string>> getLines(std::string filename) {
 
   ifstream file(filename, ios_base::binary);
@@ -62,27 +61,29 @@ vector<vector<string>> getLines(std::string filename) {
 }
 
 
-// Returns a matrix with encoded category labels
-mat getEncodedLabels(vector<vector<string>> vec) {
+map<string, int> getLabelMap(vector<vector<string>> vec) {
   set<string> labels;
   for(auto &item : vec) {
     labels.insert(item[CATEGORY_COL]);
   }
 
-  map<string, int> labelsMap;
+  map<string, int> labelMap;
   int i = 0;
   for (auto &label : labels) {
-    labelsMap.emplace(label, i);
+    labelMap.emplace(label, i);
     i++;
   }
+  return labelMap;
+}
 
-  mat labelsMat;
+mat getLabels(vector<vector<string>> vec, map<string, int> labelsMap) {
+  mat labels(vec.size(), 1);
   int counter = 0;
   for(auto &item : vec) {
-    labelsMat(counter, 0) = labelsMap.at(item[CATEGORY_COL]);
+    labels(counter, 0) = labelsMap.at(item[CATEGORY_COL]);
     counter++;
   }
-  return labelsMat;
+  return labels;
 }
 
 mat getFeatures(vector<vector<string>> vec) {
@@ -109,28 +110,62 @@ mat getFeatures(vector<vector<string>> vec) {
   return features;
 }
 
+mat scaleFeatures(mat X, mat mu, mat sigma) {
+  for (int i = 0; i < X.n_cols; ++i) {
+    X.col(i) = (X.col(i) - mu(i))/sigma(i);
+  }
+  return X;
+}
+
+mat sigmoide(mat z){
+  return pow(1.0 + exp(-z), -1);
+}
+
+// mat trainLogReg() {
+//   float alpha = 1;
+//   for (int i = 1; i < 500; i++){
+//     theta = theta - (alpha/m)*X.t()*(g(X*theta)-y);
+//   }
+// }
 
 int main(int argc, char const *argv[])
 {
   clock_t tStart = clock();
 
-  vector<vector<string>> vec = getLines(argv[1]);
+  vector<vector<string>> lines = getLines(argv[1]);
 
-  printf("getLines: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("getLines X: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
   tStart = clock();
 
-  mat y_train = getEncodedLabels(vec);
+  map<string, int> labelsMap = getLabelMap(lines);
 
-  mat X_train = getFeatures(vec);
+  mat y_train = getLabels(lines, labelsMap);
 
-  printf("getFeatures: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  mat X_train = getFeatures(lines);
 
-  // X_train.save("foo.mat", csv_ascii);
+  mat mu = mean(X_train); // media
+  mat sigma = stddev(X_train); // desviacion estandar
 
-  for(auto &item : vec) {
-    // copy(item.begin(), item.end(), ostream_iterator<string>(cout, "|"));
-    // cout << endl;
-  }
+  X_train = scaleFeatures(X_train, mu, sigma);
+  X_train = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
+
+  printf("prepare X: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  tStart = clock();
+
+  lines = getLines(argv[2]);
+
+  printf("getLines Y: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  tStart = clock();
+
+  DATES_COL = 1;
+  mat X_test = getFeatures(lines);
+  X_test = scaleFeatures(X_test, mu, sigma);
+  X_test = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
+
+  printf("prepare Y: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  // tStart = clock();
+
+  // y_train.save("foo.mat", csv_ascii);
 
   return 0;
 }
