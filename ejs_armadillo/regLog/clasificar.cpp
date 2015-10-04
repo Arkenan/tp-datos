@@ -48,9 +48,9 @@ int main(){
 	// Cargo los datos. Hay que ver si se puede
 	// trabajar sobre la misma matriz de datos en lugar de duplicar.
 	mat datos;
-	cout << "cargando datos..." << endl;
+	cout << "Cargando datos..." << endl;
 	datos.load("trainingRegLog.csv");
-	cout << "modificand datos..." << endl;
+	cout << "Modificando datos..." << endl;
 	// Training Set.
 	mat X = datos.cols(span(0,2));
 	int m = X.n_rows;
@@ -77,15 +77,16 @@ int main(){
 	vec theta(n+1,1);
 	theta.fill(1.0);
 
-	cout << "entrenando..." << endl;
+	cout << "Entrenando..." << endl;
 	// Gradient Descent para entrenar.
 	float alpha = 1;
 	for (int i = 1; i < 500; i++){
 		theta = theta - (alpha/m)*X.t()*(g(X*theta)-y);
 	}
-	theta.print("theta entrenado:");
 
-	cout << "prediciendo..." << endl;
+	theta.print("Theta entrenado:");
+
+	cout << "Prediciendo..." << endl;
 	// Empiezan las pruebas
 
 	mat datosCross;
