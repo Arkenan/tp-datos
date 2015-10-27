@@ -3,3 +3,7 @@ diseño/*
 !diseño/informe.tex
 !diseño/partes
 !diseño/images
+/Debug/
+
+/huemul/debug
+/huemul/release

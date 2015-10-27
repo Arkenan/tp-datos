@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
-#include <string>
 #include <map>
 #include <set>
 
@@ -11,12 +10,11 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
-#include "vendor/csv.h"
-
-#include <time.h>
+#include "common.hpp"
+#include "core.hpp"
+#include "io.hpp"
 
 using namespace arma;
-using namespace std;
 using namespace boost;
 
 int DATES_COL = 0;
@@ -111,13 +109,13 @@ mat getFeatures(vector<vector<string>> vec) {
 }
 
 mat scaleFeatures(mat X, mat mu, mat sigma) {
-  for (int i = 0; i < X.n_cols; ++i) {
+  for (unsigned int i = 0; i < X.n_cols; ++i) {
     X.col(i) = (X.col(i) - mu(i))/sigma(i);
   }
   return X;
 }
 
-mat sigmoide(mat z){
+mat sigmoide(mat z) {
   return pow(1.0 + exp(-z), -1);
 }
 
@@ -128,9 +126,13 @@ mat sigmoide(mat z){
 //   }
 // }
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
   clock_t tStart = clock();
+
+  if (argc < 3) {
+    printf("Usage\n ./huemul train.csv.gz test.csv.gz\n");
+    return 0;
+  }
 
   vector<vector<string>> lines = getLines(argv[1]);
 
@@ -166,6 +168,18 @@ int main(int argc, char const *argv[])
   // tStart = clock();
 
   // y_train.save("foo.mat", csv_ascii);
+
+
+  // Print()
+  //   .message("Fooo")
+  //   .setName("First Print")
+  //   .then(&Print()
+  //         .message("Bar")
+  //         .setName("Second Print"))
+  //   .then(&Print()
+  //         .message("Baz")
+  //         .setName("Third Print"))
+  //   .process();
 
   return 0;
 }
