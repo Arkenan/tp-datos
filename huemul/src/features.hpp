@@ -12,7 +12,7 @@ using namespace arma;
 
 map<string, int> getLabelMap(parsedStrings vec);
 mat getLabels(parsedStrings vec, map<string, int> labelsMap);
-mat getFeatures(parsedStrings vec);
+mat getFeatures(parsedStrings vec, int datesCol);
 
 mat scaleFeatures(mat X, mat mu, mat sigma);
 mat sigmoide(mat z);

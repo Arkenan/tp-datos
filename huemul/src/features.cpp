@@ -4,7 +4,6 @@
 
 using namespace boost;
 
-int DATES_COL = 0;
 int CATEGORY_COL = 1;
 
 
@@ -33,12 +32,12 @@ mat getLabels(parsedStrings vec, map<string, int> labelsMap) {
   return labels;
 }
 
-mat getFeatures(parsedStrings vec) {
+mat getFeatures(parsedStrings vec, int datesCol) {
   mat features(vec.size(), 4);
 
   int counter = 0;
   for(auto &item : vec) {
-    auto date = item[DATES_COL];
+    auto date = item[datesCol];
 
     // 2014-08-04 16:30:00
     auto year = stoi(date.substr(0, 4));
