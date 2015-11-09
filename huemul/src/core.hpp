@@ -9,23 +9,27 @@ public:
   string name;
 
   Step();
+  Step(string n);
 
   Step& then(Step* next);
 
   Step& setName(string name);
 
-  void previous(Step& previous);
-
   void init();
   void tearDown();
 
   void process();
+  void process(Step* step);
+
+  void logElapsedTime();
+  void print();
 
 private:
   Step* next_;
-  virtual void doProcess_() = 0;
+  virtual void doProcess_(Step* prev) = 0;
 
-  clock_t tStart_;
+  clock_t start_;
 };
+
 
 #endif

@@ -2,7 +2,8 @@ TARGET = huemul
 
 SRC = main.cpp \
     core.cpp \
-    io.cpp
+    io.cpp \
+    features.cpp
 
 INCLUDE_PATH = src
 

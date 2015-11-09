@@ -2,22 +2,19 @@
 #ifndef HUEMUL_IO_H
 #define HUEMUL_IO_H
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 #include "core.hpp"
 
+#include <boost/iostreams/filtering_streambuf.hpp>
+typedef vector<vector<string>> parsedStrings;
 
-class Print: public Step {
 
-public:
-  Step& message(string);
+using namespace boost::iostreams;
 
-private:
-  string message_;
-  virtual void doProcess_();
-};
-
-class Ungzip: public Step {
-private:
-  virtual void doProcess_();
-};
+parsedStrings getLines(std::string filename);
+void writeLines(parsedStrings lines);
 
 #endif

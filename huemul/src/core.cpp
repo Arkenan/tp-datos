@@ -4,6 +4,9 @@
 Step::Step(): name("Base step"), next_(NULL) {
 };
 
+Step::Step(string n): name(n), next_(NULL) {
+};
+
 Step& Step::then(Step* next) {
   if (next_) {
     next_->then(next);
@@ -19,21 +22,31 @@ Step& Step::setName(string name) {
 }
 
 void Step::init() {
-  tStart_ = clock();
+  start_ = clock();
 };
 
 void Step::tearDown() {
-  clock_t tStop = clock();
-  double timeElapsed = (double)(tStop - tStart_) / CLOCKS_PER_SEC;
-  printf("%s X: %.2fs\n", name.c_str(), timeElapsed);
+  logElapsedTime();
 
   if (next_) {
-    next_->process();
+    next_->process(this);
   }
 };
 
-void Step::process() {
+void Step::process(Step* previous) {
   init();
-  doProcess_();
+  doProcess_(previous);
   tearDown();
 };
+
+void Step::process() {
+  process((Step*) NULL);
+}
+
+void Step::logElapsedTime() {
+  clock_t now = clock();
+  double timeElapsed = (double)(now - start_) / CLOCKS_PER_SEC;
+  printf("%s: %.4fs\n", name.c_str(), timeElapsed);
+}
+
+void Step::print() {}
