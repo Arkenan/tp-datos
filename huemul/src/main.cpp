@@ -9,19 +9,27 @@ double timeDiff(double start) {
   return (clock() - start) / CLOCKS_PER_SEC;
 };
 
+#ifdef DNDEBUG
+#define D(X, S) X
+#else
+#define D(X, S) {\
+  printf("Starting %s...\n", S); \
+  clock_t tStart = clock(); \
+  X; \
+  printf("Finished %s: %.2fs elapsed\n", S, timeDiff(tStart)); \
+}
+#endif
+
 int main(int argc, char const *argv[]) {
-  clock_t tStart = clock();
 
   if (argc < 3) {
     printf("Usage\n ./huemul train.csv.gz test.csv.gz\n");
     return 0;
   }
+  parsedStrings lines;
+  D(lines = getLines(argv[1]), "getLines X");
 
-  parsedStrings lines = getLines(argv[1]);
-
-  printf("getLines X: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
-
+  clock_t tStart = clock();
   map<string, int> labelsMap = getLabelMap(lines);
 
   mat y_train = getLabels(lines, labelsMap);
