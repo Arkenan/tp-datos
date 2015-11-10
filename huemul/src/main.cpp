@@ -5,6 +5,9 @@
 #include "io.hpp"
 #include "features.hpp"
 
+double timeDiff(double start) {
+  return (clock() - start) / CLOCKS_PER_SEC;
+};
 
 int main(int argc, char const *argv[]) {
   clock_t tStart = clock();
@@ -14,9 +17,9 @@ int main(int argc, char const *argv[]) {
     return 0;
   }
 
-  vector<vector<string>> lines = getLines(argv[1]);
+  parsedStrings lines = getLines(argv[1]);
 
-  printf("getLines X: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("getLines X: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
   map<string, int> labelsMap = getLabelMap(lines);
@@ -31,22 +34,23 @@ int main(int argc, char const *argv[]) {
   X_train = scaleFeatures(X_train, mu, sigma);
   X_train = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
-  printf("prepare X: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("prepare X: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
   lines = getLines(argv[2]);
 
-  printf("getLines Y: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("getLines Y: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
   mat X_test = getFeatures(lines, 1);
   X_test = scaleFeatures(X_test, mu, sigma);
   X_test = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
-  printf("prepare Y: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("prepare Y: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
-  y_train.save("foo.mat", csv_ascii);
+  writeMatrix(X_train, "foo.csv.gz");
+  printf("writeMatrix: %.2fs\n", timeDiff(tStart));
 
   return 0;
 }

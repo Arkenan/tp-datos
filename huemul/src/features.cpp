@@ -58,18 +58,8 @@ mat getFeatures(parsedStrings vec, int datesCol) {
 
 mat scaleFeatures(mat X, mat mu, mat sigma) {
   for (unsigned int i = 0; i < X.n_cols; ++i) {
-    X.col(i) = (X.col(i) - mu(i))/sigma(i);
+    X.col(i) = (X.col(i) - mu(i)) / sigma(i);
   }
   return X;
 }
 
-mat sigmoide(mat z) {
-  return pow(1.0 + exp(-z), -1);
-}
-
-// mat trainLogisticRegression(mat X) {
-//   float alpha = 1;
-//   for (int i = 1; i < 500; i++){
-//     theta = theta - (alpha/m) * X.t() * (g(X * theta) - y);
-//   }
-// }
