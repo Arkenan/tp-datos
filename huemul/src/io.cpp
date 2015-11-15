@@ -1,11 +1,13 @@
 
+#include <limits>
+
 #include "io.hpp"
 
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/copy.hpp>
 
 
-parsedStrings getLines(std::string filename) {
+parsedStrings getLines(string filename, int numlines) {
 
   ifstream file(filename, ios_base::binary);
   filtering_streambuf<input> inbuf;
@@ -18,18 +20,18 @@ parsedStrings getLines(std::string filename) {
   string headers;
   getline(stream, headers);
 
-  cout << "Headers: " << headers << endl;
-
   vector<string> line;
   string token;
 
-  int ch;
-  while (EOF != (ch = stream.get())) {
+  int ch, count = 0, stop = false;
+  while (EOF != (ch = stream.get()) && !stop) {
     switch(ch) {
       case '\n':
           vec.push_back(line);
           line.clear();
           token.clear();
+          count++;
+          if (count > numlines) stop = true;
           break;
       case ',':
           line.push_back(token);
@@ -44,14 +46,23 @@ parsedStrings getLines(std::string filename) {
 }
 
 
-void writeLines(parsedStrings lines) {
-  string result_ = "";
+parsedStrings getLines(string filename) {
+  int numlines = numeric_limits<int>::max();
+  return getLines(filename, numlines);
+}
 
-  for (int i = 0; i < lines.size(); ++i) {
-    for (int j = 0; j < lines[i].size(); ++j)
-    {
-      result_ += lines[i][j] + ',';
-    }
-    result_ += "\n";
-  }
+
+void writeMatrix(mat matrix, string filename) {
+  stringstream sourcestream;
+
+
+  ofstream f(filename, std::ios_base::out | std::ios_base::binary);
+  matrix.save(sourcestream, csv_ascii);
+  filtering_streambuf<output> output;
+  output.push(gzip_compressor());
+  output.push(f);
+
+  copy(sourcestream, output);
+
+  f.close();
 }

@@ -5,20 +5,31 @@
 #include "io.hpp"
 #include "features.hpp"
 
+double timeDiff(double start) {
+  return (clock() - start) / CLOCKS_PER_SEC;
+};
+
+#ifdef DNDEBUG
+#define D(X, S) X
+#else
+#define D(X, S) {\
+  printf("Starting %s...\n", S); \
+  clock_t tStart = clock(); \
+  X; \
+  printf("Finished %s: %.2fs elapsed\n", S, timeDiff(tStart)); \
+}
+#endif
 
 int main(int argc, char const *argv[]) {
-  clock_t tStart = clock();
 
   if (argc < 3) {
     printf("Usage\n ./huemul train.csv.gz test.csv.gz\n");
     return 0;
   }
+  parsedStrings lines;
+  D(lines = getLines(argv[1]), "getLines X");
 
-  vector<vector<string>> lines = getLines(argv[1]);
-
-  printf("getLines X: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
-  tStart = clock();
-
+  clock_t tStart = clock();
   map<string, int> labelsMap = getLabelMap(lines);
 
   mat y_train = getLabels(lines, labelsMap);
@@ -31,22 +42,23 @@ int main(int argc, char const *argv[]) {
   X_train = scaleFeatures(X_train, mu, sigma);
   X_train = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
-  printf("prepare X: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("prepare X: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
   lines = getLines(argv[2]);
 
-  printf("getLines Y: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("getLines Y: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
   mat X_test = getFeatures(lines, 1);
   X_test = scaleFeatures(X_test, mu, sigma);
   X_test = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
-  printf("prepare Y: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+  printf("prepare Y: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
-  y_train.save("foo.mat", csv_ascii);
+  writeMatrix(X_train, "foo.csv.gz");
+  printf("writeMatrix: %.2fs\n", timeDiff(tStart));
 
   return 0;
 }
