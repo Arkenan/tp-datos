@@ -7,6 +7,8 @@
 using namespace arma;
 
 mat sigmoide(mat z);
-// mat trainLogisticRegression(mat X);
+
+
+mat obtenerThetaEntrenado(mat X, mat Y, float alpha);
 
 #endif
