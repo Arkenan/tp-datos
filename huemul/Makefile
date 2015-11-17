@@ -12,6 +12,8 @@ INCLUDE_PATH = src
 
 # LIB_PATH_DEBUG = ./lib
 
-LIB = boost_iostreams
+LIB = boost_iostreams \
+			armadillo
+
 
 include build.mk

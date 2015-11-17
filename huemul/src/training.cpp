@@ -35,7 +35,7 @@ mat obtenerThetaEntrenado(mat X, mat Y, float alpha){
      * Y es la matriz de m x c que contiene las m respuestas representadas por
      * vectores de tamaño c.
     */
-    // Theta = Theta - (alpha/m)*X.t()*(sigmoide(X*Theta)-Y);
+    Theta = Theta - (alpha/m)*X.t()*(sigmoide(X*Theta)-Y);
   }
 
   return Theta;
