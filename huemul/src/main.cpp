@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
 
   clock_t tStart = clock();
   map<string, int> labelsMap = getLabelMap(lines);
-
+  
   mat y_train = getLabels(lines, labelsMap);
 
   mat X_train = getFeatures(lines, 0);

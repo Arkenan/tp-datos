@@ -5,6 +5,7 @@
 using namespace boost;
 
 int CATEGORY_COL = 1;
+int CANT_CATEGORIAS = 39;
 
 
 map<string, int> getLabelMap(parsedStrings vec) {
@@ -23,10 +24,13 @@ map<string, int> getLabelMap(parsedStrings vec) {
 }
 
 mat getLabels(parsedStrings vec, map<string, int> labelsMap) {
-  mat labels(vec.size(), 1);
+  mat labels(vec.size(), CANT_CATEGORIAS);
   int counter = 0;
   for(auto &item : vec) {
-    labels(counter, 0) = labelsMap.at(item[CATEGORY_COL]);
+    rowvec respuestaBinarizada = rowvec(CANT_CATEGORIAS);
+    respuestaBinarizada.zeros();
+    respuestaBinarizada.col( labelsMap.at(item[CATEGORY_COL]) ) = 1;
+    labels.row( counter ) = respuestaBinarizada;
     counter++;
   }
   return labels;
@@ -62,4 +66,3 @@ mat scaleFeatures(mat X, mat mu, mat sigma) {
   }
   return X;
 }
-
