@@ -51,12 +51,30 @@ parsedStrings getLines(string filename) {
 }
 
 
-void writeMatrix(mat matrix, string filename) {
+void writeMatrix(mat matrix, map<string, int> labelsMap, string filename) {
   stringstream sourcestream;
 
+  // Agrego headers
+  bool first = true;
+  sourcestream << "Id";
+  for(auto imap: labelsMap) {
+    sourcestream << ',' << imap.first;
+  }
+  sourcestream << endl;
+
+  int rows = matrix.n_rows;
+  int cols = matrix.n_cols;
+
+  for (int i = 0; i < rows; ++i) {
+    // Agrego ids
+    sourcestream << i;
+    for (int j = 0; j < cols; ++j) {
+      sourcestream << ',' << matrix(i, j);
+    }
+    sourcestream << endl;
+  }
 
   ofstream f(filename, std::ios_base::out | std::ios_base::binary);
-  matrix.save(sourcestream, csv_ascii);
   filtering_streambuf<output> output;
   output.push(gzip_compressor());
   output.push(f);

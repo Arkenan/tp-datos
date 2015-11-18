@@ -2,10 +2,6 @@
 #ifndef HUEMUL_FEATURES_H
 #define HUEMUL_FEATURES_H
 
-#include <armadillo>
-#include <map>
-#include <set>
-
 #include "io.hpp"
 
 using namespace arma;

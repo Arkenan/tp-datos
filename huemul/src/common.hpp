@@ -5,6 +5,10 @@
 #include <string>
 #include <iterator>
 #include <vector>
+#include <map>
+#include <set>
+
+#include <armadillo>
 
 #include <time.h>
 

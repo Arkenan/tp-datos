@@ -5,6 +5,7 @@
 /* Logistic Regression con One vs. All */
 float ALPHA = 1;
 
+
 // Funcion sigmoidea
 mat sigmoide(mat z) {
   return pow(1.0 + exp(-z), -1);
@@ -22,7 +23,7 @@ mat obtenerThetaEntrenado(mat X, mat Y){
   mat Theta(n,c);
   Theta.fill(1.0);
 
-  for (int i = 1; i < 10; i++){
+  for (int i = 1; i < 30; i++){
     /*
      * Gradient Descent para entrenar:
      * Aplica one versus all. Cada columna de Theta es un vector theta que le
@@ -37,6 +38,11 @@ mat obtenerThetaEntrenado(mat X, mat Y){
      * vectores de tamaño c.
     */
     Theta = Theta - (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
+
+#ifndef DNDEBUG
+    double loss = logloss(predecir(X, Theta), Y);
+    printf ("terminada la iteración: %d, Logloss obtenido: %f \n", i, loss);
+#endif
   }
 
   return Theta;
@@ -48,9 +54,31 @@ mat predecir(mat X_test, mat Theta){
 }
 
 
+mat clipMat(mat matrix, double eps) {
+  // Clipping, no sé si es necesario
+  int rows = matrix.n_rows;
+  int cols = matrix.n_cols;
+  mat Y_clipped(rows, cols);
+  for (int i = 0; i < rows; ++i) {
+    for (int j = 0; j < cols; ++j) {
+      double element = matrix(i, j);
+      if (eps < element) {
+        if (element > 1 - eps) {
+          Y_clipped(i, j) = 1 - eps;
+        } else {
+          Y_clipped(i, j) = element;
+        }
+      } else {
+        Y_clipped(i, j) = eps;
+      }
+    };
+  };
+  return Y_clipped;
+}
+
 
 double logloss(mat Y_pred, mat Y_true) {
-  double eps = pow(1, -15);
-  mat Y_clipped = max(min(Y_pred, eps), eps) / sum(Y_pred, 1);
-  return -sum(sum(Y_true % log(Y_clipped)));
+  // Clip para mejorar logloss
+  mat Y_pred_clipped = clipMat(Y_pred, pow(10, -15));
+  return -sum(sum(Y_true % log(Y_pred_clipped))) / Y_pred.n_rows;
 }

@@ -34,6 +34,6 @@ parsedStrings getLines(std::string filename, int numlines);
 /**
  * Escribe una matriz de armadillo a disco en formato csv, comprimido con gz.
  */
-void writeMatrix(mat matrix, string filename);
+void writeMatrix(mat matrix, map<string, int> labelsMap, string filename);
 
 #endif

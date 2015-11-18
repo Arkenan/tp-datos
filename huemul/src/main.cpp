@@ -68,7 +68,9 @@ int main(int argc, char const *argv[]) {
 
   mat respuesta = predecir(X_test, Theta);
 
-  writeMatrix(respuesta, "foo.csv.gz");
+  printf("prediccion: %.2fs\n", timeDiff(tStart));
+  tStart = clock();
+  writeMatrix(respuesta, labelsMap, "prueba.csv.gz");
   printf("writeMatrix: %.2fs\n", timeDiff(tStart));
 
   return 0;
