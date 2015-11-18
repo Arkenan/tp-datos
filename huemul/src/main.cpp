@@ -4,6 +4,7 @@
 #include "core.hpp"
 #include "io.hpp"
 #include "features.hpp"
+#include "training.hpp"
 
 double timeDiff(double start) {
   return (clock() - start) / CLOCKS_PER_SEC;
@@ -28,7 +29,7 @@ int main(int argc, char const *argv[]) {
     return 0;
   }
   parsedStrings lines;
-  D(lines = getLines(argv[1], 100), "getLines X");
+  D(lines = getLines(argv[1]), "getLines X");
 
   clock_t tStart = clock();
   map<string, int> labelsMap = getLabelMap(lines);
@@ -40,30 +41,35 @@ int main(int argc, char const *argv[]) {
   mat mu = mean(X_train); // media
   mat sigma = stddev(X_train); // desviacion estandar
 
-  mu.raw_print();
-  sigma.raw_print();
-  X_train.raw_print();
   X_train = scaleFeatures(X_train, mu, sigma);
   X_train = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
+  printf("prepare X_train, Y_train: %.2fs\n", timeDiff(tStart));
+  tStart = clock();
 
-  // printf("prepare X: %.2fs\n", timeDiff(tStart));
-  // tStart = clock();
+  mat Theta =  obtenerThetaEntrenado(X_train, y_train);
 
-  // lines = getLines(argv[2]);
+  printf("train Logistic Regression: %.2fs\n", timeDiff(tStart));
+  // Comienzo de lectura del set de test.
+  tStart = clock();
 
-  // printf("getLines Y: %.2fs\n", timeDiff(tStart));
-  // tStart = clock();
+  lines = getLines(argv[2]);
 
-  // mat X_test = getFeatures(lines, 1);
-  // X_test = scaleFeatures(X_test, mu, sigma);
-  // X_test = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
+  printf("getLines X_test: %.2fs\n", timeDiff(tStart));
+  tStart = clock();
 
-  // printf("prepare Y: %.2fs\n", timeDiff(tStart));
-  // tStart = clock();
+  mat X_test = getFeatures(lines, 1);
 
-  // writeMatrix(X_train, "foo.csv.gz");
-  // printf("writeMatrix: %.2fs\n", timeDiff(tStart));
+  X_test = scaleFeatures(X_test, mu, sigma);
+  X_test = join_rows(vec(X_test.n_rows).fill(1.0), X_test);
+
+  printf("prepare Y: %.2fs\n", timeDiff(tStart));
+  tStart = clock();
+
+  mat respuesta = predecir(X_test, Theta);
+
+  writeMatrix(respuesta, "foo.csv.gz");
+  printf("writeMatrix: %.2fs\n", timeDiff(tStart));
 
   return 0;
 }

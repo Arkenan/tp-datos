@@ -3,6 +3,7 @@
 
 
 /* Logistic Regression con One vs. All */
+float ALPHA = 1;
 
 // Funcion sigmoidea
 mat sigmoide(mat z) {
@@ -12,7 +13,7 @@ mat sigmoide(mat z) {
 // X es la matriz de datos ([m casos] X [n features + BIAS])
 // X ya se supone normalizada, y con la columna de BIAS agregada.
 // Y es la matriz de respuestas ([m casos] X [c categorias posibles])
-mat obtenerThetaEntrenado(mat X, mat Y, float alpha){
+mat obtenerThetaEntrenado(mat X, mat Y){
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
@@ -21,7 +22,7 @@ mat obtenerThetaEntrenado(mat X, mat Y, float alpha){
   mat Theta(n,c);
   Theta.fill(1.0);
 
-  for (int i = 1; i < 500; i++){
+  for (int i = 1; i < 10; i++){
     /*
      * Gradient Descent para entrenar:
      * Aplica one versus all. Cada columna de Theta es un vector theta que le
@@ -35,11 +36,17 @@ mat obtenerThetaEntrenado(mat X, mat Y, float alpha){
      * Y es la matriz de m x c que contiene las m respuestas representadas por
      * vectores de tamaño c.
     */
-    Theta = Theta - (alpha / m) * X.t() * (sigmoide(X * Theta) - Y);
+    Theta = Theta - (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
   }
 
   return Theta;
 }
+
+mat predecir(mat X_test, mat Theta){
+  mat resultado = sigmoide(X_test * Theta);
+  return resultado;
+}
+
 
 
 double logloss(mat Y_pred, mat Y_true) {
