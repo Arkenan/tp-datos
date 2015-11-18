@@ -4,6 +4,7 @@
 #include "core.hpp"
 #include "io.hpp"
 #include "features.hpp"
+#include "training.hpp"
 
 double timeDiff(double start) {
   return (clock() - start) / CLOCKS_PER_SEC;
@@ -31,7 +32,7 @@ int main(int argc, char const *argv[]) {
 
   clock_t tStart = clock();
   map<string, int> labelsMap = getLabelMap(lines);
-  
+
   mat y_train = getLabels(lines, labelsMap);
 
   mat X_train = getFeatures(lines, 0);
@@ -42,22 +43,31 @@ int main(int argc, char const *argv[]) {
   X_train = scaleFeatures(X_train, mu, sigma);
   X_train = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
-  printf("prepare X: %.2fs\n", timeDiff(tStart));
+  printf("prepare X_train, Y_train: %.2fs\n", timeDiff(tStart));
+  tStart = clock();
+
+  mat Theta =  obtenerThetaEntrenado(X_train, y_train);
+
+  printf("train Logistic Regression: %.2fs\n", timeDiff(tStart));
+  // Comienzo de lectura del set de test.
   tStart = clock();
 
   lines = getLines(argv[2]);
 
-  printf("getLines Y: %.2fs\n", timeDiff(tStart));
+  printf("getLines X_test: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
   mat X_test = getFeatures(lines, 1);
+
   X_test = scaleFeatures(X_test, mu, sigma);
-  X_test = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
+  X_test = join_rows(vec(X_test.n_rows).fill(1.0), X_test);
 
   printf("prepare Y: %.2fs\n", timeDiff(tStart));
   tStart = clock();
 
-  writeMatrix(X_train, "foo.csv.gz");
+  mat respuesta = predecir(X_test, Theta);
+
+  writeMatrix(respuesta, "foo.csv.gz");
   printf("writeMatrix: %.2fs\n", timeDiff(tStart));
 
   return 0;
