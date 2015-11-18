@@ -35,8 +35,15 @@ mat obtenerThetaEntrenado(mat X, mat Y, float alpha){
      * Y es la matriz de m x c que contiene las m respuestas representadas por
      * vectores de tamaño c.
     */
-    Theta = Theta - (alpha/m)*X.t()*(sigmoide(X*Theta)-Y);
+    Theta = Theta - (alpha / m) * X.t() * (sigmoide(X * Theta) - Y);
   }
 
   return Theta;
+}
+
+
+double logloss(mat Y_pred, mat Y_true) {
+  double eps = pow(1, -15);
+  mat Y_clipped = max(min(Y_pred, eps), eps) / sum(Y_pred, 1);
+  return -sum(sum(Y_true % log(Y_clipped)));
 }

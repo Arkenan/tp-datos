@@ -30,8 +30,7 @@ parsedStrings getLines(string filename, int numlines) {
           vec.push_back(line);
           line.clear();
           token.clear();
-          count++;
-          if (count > numlines) stop = true;
+          if (++count > numlines) stop = true;
           break;
       case ',':
           line.push_back(token);

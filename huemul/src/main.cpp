@@ -20,6 +20,7 @@ double timeDiff(double start) {
 }
 #endif
 
+
 int main(int argc, char const *argv[]) {
 
   if (argc < 3) {
@@ -27,7 +28,7 @@ int main(int argc, char const *argv[]) {
     return 0;
   }
   parsedStrings lines;
-  D(lines = getLines(argv[1]), "getLines X");
+  D(lines = getLines(argv[1], 100), "getLines X");
 
   clock_t tStart = clock();
   map<string, int> labelsMap = getLabelMap(lines);
@@ -39,26 +40,30 @@ int main(int argc, char const *argv[]) {
   mat mu = mean(X_train); // media
   mat sigma = stddev(X_train); // desviacion estandar
 
+  mu.raw_print();
+  sigma.raw_print();
+  X_train.raw_print();
   X_train = scaleFeatures(X_train, mu, sigma);
   X_train = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
-  printf("prepare X: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
 
-  lines = getLines(argv[2]);
+  // printf("prepare X: %.2fs\n", timeDiff(tStart));
+  // tStart = clock();
 
-  printf("getLines Y: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
+  // lines = getLines(argv[2]);
 
-  mat X_test = getFeatures(lines, 1);
-  X_test = scaleFeatures(X_test, mu, sigma);
-  X_test = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
+  // printf("getLines Y: %.2fs\n", timeDiff(tStart));
+  // tStart = clock();
 
-  printf("prepare Y: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
+  // mat X_test = getFeatures(lines, 1);
+  // X_test = scaleFeatures(X_test, mu, sigma);
+  // X_test = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
 
-  writeMatrix(X_train, "foo.csv.gz");
-  printf("writeMatrix: %.2fs\n", timeDiff(tStart));
+  // printf("prepare Y: %.2fs\n", timeDiff(tStart));
+  // tStart = clock();
+
+  // writeMatrix(X_train, "foo.csv.gz");
+  // printf("writeMatrix: %.2fs\n", timeDiff(tStart));
 
   return 0;
 }
