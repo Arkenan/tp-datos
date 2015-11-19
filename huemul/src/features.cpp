@@ -140,7 +140,6 @@ mat FeatureConverter::process(bool test) {
 
   mat features = getDateFeatures(vec, dayOfWeekCol);
 
-  // features.head_rows(50).raw_print();
 
   mat districts = districts_.transform(vec, districtCol);
   mat daysOfWeek = daysOfWeek_.transform(vec, dayOfWeekCol);
@@ -154,10 +153,12 @@ mat FeatureConverter::process(bool test) {
   }
 
   // Escalo las features
-  features = scaleFeatures(features, mu_, sigma_);
+  features = scaleFeatures(features, mu_, sigma_, 4);
 
   // Agrego bias
   features.insert_cols(0, colvec(features.n_rows).fill(1.0));
+
+  features.head_rows(50).raw_print();
 
   return features;
 }
@@ -200,9 +201,13 @@ mat getFeatures(parsedStrings vec, int datesCol) {
   return features;
 }
 
-mat scaleFeatures(mat X, mat mu, mat sigma) {
-  for (unsigned int i = 0; i < X.n_cols; ++i) {
+mat scaleFeatures(mat X, mat mu, mat sigma, int columns) {
+  for (unsigned int i = 0; i < columns; ++i) {
     X.col(i) = (X.col(i) - mu(i)) / sigma(i);
   }
   return X;
+}
+
+mat scaleFeatures(mat X, mat mu, mat sigma) {
+  return scaleFeatures(X, mu, sigma, X.n_cols);
 }

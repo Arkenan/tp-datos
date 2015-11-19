@@ -36,6 +36,11 @@ mat getFeatures(parsedStrings vec, int datesCol);
  */
 mat scaleFeatures(mat X, mat mu, mat sigma);
 
+/**
+ * Escala las primeras @columns
+ */
+mat scaleFeatures(mat X, mat mu, mat sigma, int colums);
+
 class LabelBinarizer {
     public:
       LabelBinarizer();
