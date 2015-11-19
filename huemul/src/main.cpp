@@ -39,7 +39,7 @@ int main(int argc, char const *argv[]) {
   mat X_test;
 
   D(X_train = converter.getTrainFeatures(), "get X_train");
-  D(X_test = converter.getTrainFeatures(), "get X_test");
+  D(X_test = converter.getTestFeatures(), "get X_test");
 
   map<string, int> labelsMap;
   mat y_train;
@@ -56,6 +56,8 @@ int main(int argc, char const *argv[]) {
 
   mat result;
   D(result = predecir(X_test, Theta), "prediction");
+
+  cout << "rows "  << result.n_rows << endl;
 
   D(writeMatrix(result, labelsMap, "output.csv.gz"), "write output");
 
