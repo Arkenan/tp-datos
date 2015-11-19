@@ -48,6 +48,8 @@ class LabelBinarizer {
       void fit(parsedStrings vec, int colnum);
       mat transform(parsedStrings vec, int colnum);
       mat transform(parsedStrings vec, int column, int features);
+
+      map<string, int> getLabels();
     private:
       map<string, int> labelsMap_;
 

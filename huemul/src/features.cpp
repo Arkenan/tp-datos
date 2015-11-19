@@ -24,21 +24,19 @@ void LabelBinarizer::fit(parsedStrings vec, int column) {
     i++;
   }
 
-  // for (const auto &p : labelsMap_) {
-  //     std::cout << p.first << " = " << p.second << '\n';
-  // }
+#ifndef DNDEBUG
+  for (const auto &p : labelsMap_) {
+      cout << p.first << " = " << p.second << '\n';
+  }
+#endif
 
 }
 
 mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
-  int size = vec.size();
-  mat labels(size, features);
+  mat labels = zeros(vec.size(), features);
   int counter = 0;
   for(auto &item : vec) {
-    rowvec respuestaBinarizada = rowvec(features);
-    respuestaBinarizada.zeros();
-    respuestaBinarizada.col( labelsMap_.at(item[column]) ) = 1;
-    labels.row( counter ) = respuestaBinarizada;
+    labels(counter, labelsMap_.at(item[column])) = 1;
     counter++;
   }
   return labels;
@@ -46,6 +44,10 @@ mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
 
 mat LabelBinarizer::transform(parsedStrings vec, int column) {
   return transform(vec, column, labelsMap_.size());
+}
+
+map<string, int> LabelBinarizer::getLabels() {
+  return labelsMap_;
 }
 
 
@@ -158,7 +160,7 @@ mat FeatureConverter::process(bool test) {
   // Agrego bias
   features.insert_cols(0, colvec(features.n_rows).fill(1.0));
 
-  features.head_rows(50).raw_print();
+  // features.head_rows(50).raw_print();
 
   return features;
 }

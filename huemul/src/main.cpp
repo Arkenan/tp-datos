@@ -30,8 +30,8 @@ int main(int argc, char const *argv[]) {
   }
   parsedStrings train;
   parsedStrings test;
-  D(train = getLines(argv[1], false), "getLines train");
-  D(test = getLines(argv[2], true), "getLines test");
+  D(train = getLines(argv[1], 10000, false), "getLines train");
+  D(test = getLines(argv[2], 10000, true), "getLines test");
 
   FeatureConverter converter(train, test);
 
@@ -41,16 +41,16 @@ int main(int argc, char const *argv[]) {
   D(X_train = converter.getTrainFeatures(), "get X_train");
   D(X_test = converter.getTestFeatures(), "get X_test");
 
-  map<string, int> labelsMap;
   mat y_train;
+  LabelBinarizer categories;
 
   D(
-  labelsMap = getLabelMap(train);
-  y_train= getLabels(train, labelsMap),
+  categories.fit(train, 1);
+  y_train = categories.transform(train, 1, 39),
   "get Y_train"
   );
 
-  // X_train.head_rows(50).raw_print();
+  // y_train.head_rows(50).raw_print();
   mat Theta;
   D(Theta = obtenerThetaEntrenado(X_train, y_train), "train Logistic Regression");
 
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[]) {
 
   cout << "rows "  << result.n_rows << endl;
 
-  D(writeMatrix(result, labelsMap, "output.csv.gz"), "write output");
+  D(writeMatrix(result, categories.getLabels(), "output.csv.gz"), "write output");
 
   return 0;
 }
