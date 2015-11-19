@@ -24,6 +24,10 @@ void LabelBinarizer::fit(parsedStrings vec, int column) {
     i++;
   }
 
+  // for (const auto &p : labelsMap_) {
+  //     std::cout << p.first << " = " << p.second << '\n';
+  // }
+
 }
 
 mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
@@ -45,11 +49,26 @@ mat LabelBinarizer::transform(parsedStrings vec, int column) {
 }
 
 
-mat getDateFeatures(parsedStrings vec, int datesCol) {
-  mat features(vec.size(), 4);
+int getSeason(int month) {
+  int result = 0;  // Winter
+  switch (month) {
+    case 3: case 4: case 5:
+      result = 1;  // Spring
+      break;
+    case 6: case 7: case 8:
+      result = 2;  // Summer
+      break;
+    case 9: case 10: case 11:
+      result = 3;  // Autumn
+  }
+  return result;
+}
+
+mat getDateFeatures(parsedStrings vec, int dayOfWeekCol) {
+  mat features(vec.size(), 11);
   int counter = 0;
   for(auto &item : vec) {
-    auto date = item[datesCol];
+    auto date = item[0];
 
     // 2014-08-04 16:30:00
     auto year = stoi(date.substr(0, 4));
@@ -62,8 +81,32 @@ mat getDateFeatures(parsedStrings vec, int datesCol) {
     features(counter, 2) = day;
     features(counter, 3) = hour;
 
+    features(counter, 4 + getSeason(month)) = 1;
+
+    auto dayOfWeek = item[dayOfWeekCol];
+    auto address = item[dayOfWeekCol + 2];
+
+    int isWeekend = 0;
+    if (dayOfWeek.compare("Saturday") == 0 || dayOfWeek.compare("Sunday") == 0) {
+      isWeekend = 1;
+    }
+    features(counter, 8) = isWeekend;
+
+    int isDayTime = 0;
+    if (hour > 6 && hour < 20) {
+      isDayTime = 1;
+    }
+    features(counter, 9) = isDayTime;
+
+    int isIntersection = 0;
+    if (address.find('/') != string::npos) {
+      isIntersection = 1;
+    }
+    features(counter, 10) = isIntersection;
+
     counter++;
   }
+
   return features;
 }
 
@@ -80,23 +123,30 @@ mat FeatureConverter::getTestFeatures() {
 
 mat FeatureConverter::process(bool test) {
 
-  int datesCol = 0, districtCol;
+  int datesCol = 0, districtCol, dayOfWeekCol;
   parsedStrings vec;
 
   if (test) {
     districtCol = 2;
+    dayOfWeekCol = 1;
     vec = test_;
   } else {
+    dayOfWeekCol = 2;
     districtCol = 3;
     vec = train_;
+    daysOfWeek_.fit(vec, dayOfWeekCol);
     districts_.fit(vec, districtCol);
   }
 
-  mat features = getDateFeatures(vec, datesCol);
+  mat features = getDateFeatures(vec, dayOfWeekCol);
+
+  // features.head_rows(50).raw_print();
 
   mat districts = districts_.transform(vec, districtCol);
+  mat daysOfWeek = daysOfWeek_.transform(vec, dayOfWeekCol);
 
-  features.insert_cols(features.n_cols, districts);
+  // features.insert_cols(features.n_cols, districts);
+  features.insert_cols(features.n_cols, daysOfWeek);
 
   if (!test) {
     mu_ = mean(features); // media

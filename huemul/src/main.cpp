@@ -30,8 +30,8 @@ int main(int argc, char const *argv[]) {
   }
   parsedStrings train;
   parsedStrings test;
-  D(train = getLines(argv[1], 10000, false), "getLines train");
-  D(test = getLines(argv[2], 10000, true), "getLines test");
+  D(train = getLines(argv[1], false), "getLines train");
+  D(test = getLines(argv[2], true), "getLines test");
 
   FeatureConverter converter(train, test);
 
@@ -50,6 +50,7 @@ int main(int argc, char const *argv[]) {
   "get Y_train"
   );
 
+  // X_train.head_rows(50).raw_print();
   mat Theta;
   D(Theta = obtenerThetaEntrenado(X_train, y_train), "train Logistic Regression");
 

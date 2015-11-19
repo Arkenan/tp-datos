@@ -58,6 +58,7 @@ class FeatureConverter {
     private:
       mat process(bool test);
       LabelBinarizer districts_;
+      LabelBinarizer daysOfWeek_;
       parsedStrings train_;
       parsedStrings test_;
 
