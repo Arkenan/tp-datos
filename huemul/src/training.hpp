@@ -19,6 +19,6 @@ mat predecir(mat X_test, mat Theta);
  */
 mat clipMat(mat matrix, double eps);
 
-double logloss(mat Y_pred, mat Y_true_clipped);
+double logloss(mat Y_pred, mat Y_true);
 
 #endif

@@ -28,50 +28,35 @@ int main(int argc, char const *argv[]) {
     printf("Usage\n ./huemul train.csv.gz test.csv.gz\n");
     return 0;
   }
-  parsedStrings lines;
-  D(lines = getLines(argv[1]), "getLines X");
+  parsedStrings train;
+  parsedStrings test;
+  D(train = getLines(argv[1], 10000, false), "getLines train");
+  D(test = getLines(argv[2], 10000, true), "getLines test");
 
-  clock_t tStart = clock();
-  map<string, int> labelsMap = getLabelMap(lines);
+  FeatureConverter converter(train, test);
 
-  mat y_train = getLabels(lines, labelsMap);
+  mat X_train;
+  mat X_test;
 
-  mat X_train = getFeatures(lines, 0);
+  D(X_train = converter.getTrainFeatures(), "get X_train");
+  D(X_test = converter.getTrainFeatures(), "get X_test");
 
-  mat mu = mean(X_train); // media
-  mat sigma = stddev(X_train); // desviacion estandar
+  map<string, int> labelsMap;
+  mat y_train;
 
-  X_train = scaleFeatures(X_train, mu, sigma);
-  X_train = join_rows(vec(X_train.n_rows).fill(1.0), X_train);
+  D(
+  labelsMap = getLabelMap(train);
+  y_train= getLabels(train, labelsMap),
+  "get Y_train"
+  );
 
-  printf("prepare X_train, Y_train: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
+  mat Theta;
+  D(Theta = obtenerThetaEntrenado(X_train, y_train), "train Logistic Regression");
 
-  mat Theta =  obtenerThetaEntrenado(X_train, y_train);
+  mat result;
+  D(result = predecir(X_test, Theta), "prediction");
 
-  printf("train Logistic Regression: %.2fs\n", timeDiff(tStart));
-  // Comienzo de lectura del set de test.
-  tStart = clock();
-
-  lines = getLines(argv[2]);
-
-  printf("getLines X_test: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
-
-  mat X_test = getFeatures(lines, 1);
-
-  X_test = scaleFeatures(X_test, mu, sigma);
-  X_test = join_rows(vec(X_test.n_rows).fill(1.0), X_test);
-
-  printf("prepare Y: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
-
-  mat respuesta = predecir(X_test, Theta);
-
-  printf("prediccion: %.2fs\n", timeDiff(tStart));
-  tStart = clock();
-  writeMatrix(respuesta, labelsMap, "prueba.csv.gz");
-  printf("writeMatrix: %.2fs\n", timeDiff(tStart));
+  D(writeMatrix(result, labelsMap, "output.csv.gz"), "write output");
 
   return 0;
 }

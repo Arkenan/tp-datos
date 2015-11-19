@@ -7,7 +7,7 @@
 #include <boost/iostreams/copy.hpp>
 
 
-parsedStrings getLines(string filename, int numlines) {
+parsedStrings getLines(string filename, int numlines, bool test) {
 
   ifstream file(filename, ios_base::binary);
   filtering_streambuf<input> inbuf;
@@ -23,18 +23,30 @@ parsedStrings getLines(string filename, int numlines) {
   vector<string> line;
   string token;
 
-  int ch, count = 0, stop = false;
+  int ch, count = 0, stop = false, colNum = 0;
   while (EOF != (ch = stream.get()) && !stop) {
     switch(ch) {
       case '\n':
+          line.push_back(token);
           vec.push_back(line);
           line.clear();
           token.clear();
+          colNum = 0;
           if (++count > numlines) stop = true;
           break;
       case ',':
-          line.push_back(token);
+          // Se ignoran la columna id para el set de test y las columnas
+          // Descript y Resolution para el set de train.
+          if ((test && colNum != 0) ||
+              (!test && colNum != 2 && colNum != 5)) {
+            line.push_back(token);
+          }
           token.clear();
+          colNum++;
+          break;
+      case '\"':
+          // Si el campo comienza con ", se ignora.
+          while ((ch = stream.get()) != '\"');
           break;
       default:
           token.push_back(ch);
@@ -45,9 +57,9 @@ parsedStrings getLines(string filename, int numlines) {
 }
 
 
-parsedStrings getLines(string filename) {
+parsedStrings getLines(string filename, bool test) {
   int numlines = numeric_limits<int>::max();
-  return getLines(filename, numlines);
+  return getLines(filename, numlines, test);
 }
 
 

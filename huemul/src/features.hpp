@@ -36,4 +36,35 @@ mat getFeatures(parsedStrings vec, int datesCol);
  */
 mat scaleFeatures(mat X, mat mu, mat sigma);
 
+class LabelBinarizer {
+    public:
+      LabelBinarizer();
+
+      void fit(parsedStrings vec, int colnum);
+      mat transform(parsedStrings vec, int colnum);
+      mat transform(parsedStrings vec, int column, int features);
+    private:
+      map<string, int> labelsMap_;
+
+};
+
+
+class FeatureConverter {
+    public:
+      FeatureConverter(parsedStrings train, parsedStrings test);
+      mat getTestFeatures();
+      mat getTrainFeatures();
+
+    private:
+      mat process(bool test);
+      LabelBinarizer districts_;
+      parsedStrings train_;
+      parsedStrings test_;
+
+      mat mu_;  // media
+      mat sigma_;  // desviación standard
+
+};
+
+
 #endif
