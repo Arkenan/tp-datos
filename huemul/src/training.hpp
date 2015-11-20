@@ -1,4 +1,3 @@
-
 #ifndef HUEMUL_TRAINING_H
 #define HUEMUL_TRAINING_H
 
@@ -6,10 +5,10 @@
 
 using namespace arma;
 
-
 mat sigmoide(mat z);
 
-mat obtenerThetaEntrenado(mat X, mat Y);
+mat SGD(mat X, mat Y);
+mat GD(mat X, mat Y);
 
 mat predecir(mat X_test, mat Theta);
 
