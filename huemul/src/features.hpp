@@ -66,6 +66,7 @@ class FeatureConverter {
       mat process(bool test);
       LabelBinarizer districts_;
       LabelBinarizer daysOfWeek_;
+      LabelBinarizer streets_;
       parsedStrings train_;
       parsedStrings test_;
 

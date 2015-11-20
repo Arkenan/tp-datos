@@ -67,7 +67,7 @@ int getSeason(int month) {
 }
 
 mat getDateFeatures(parsedStrings vec, int dayOfWeekCol) {
-  mat features(vec.size(), 11);
+  mat features(vec.size(), 13);
   int counter = 0;
   for(auto &item : vec) {
     auto date = item[0];
@@ -82,8 +82,10 @@ mat getDateFeatures(parsedStrings vec, int dayOfWeekCol) {
     features(counter, 1) = month;
     features(counter, 2) = day;
     features(counter, 3) = hour;
+    features(counter, 4) = stof(item[dayOfWeekCol + 3]);
+    features(counter, 5) = stof(item[dayOfWeekCol + 4]);
 
-    features(counter, 4 + getSeason(month)) = 1;
+    features(counter, 6 + getSeason(month)) = 1;
 
     auto dayOfWeek = item[dayOfWeekCol];
     auto address = item[dayOfWeekCol + 2];
@@ -92,19 +94,19 @@ mat getDateFeatures(parsedStrings vec, int dayOfWeekCol) {
     if (dayOfWeek.compare("Saturday") == 0 || dayOfWeek.compare("Sunday") == 0) {
       isWeekend = 1;
     }
-    features(counter, 8) = isWeekend;
+    features(counter, 10) = isWeekend;
 
     int isDayTime = 0;
     if (hour > 6 && hour < 20) {
       isDayTime = 1;
     }
-    features(counter, 9) = isDayTime;
+    features(counter, 11) = isDayTime;
 
     int isIntersection = 0;
     if (address.find('/') != string::npos) {
       isIntersection = 1;
     }
-    features(counter, 10) = isIntersection;
+    features(counter, 12) = isIntersection;
 
     counter++;
   }
@@ -138,6 +140,7 @@ mat FeatureConverter::process(bool test) {
     vec = train_;
     daysOfWeek_.fit(vec, dayOfWeekCol);
     districts_.fit(vec, districtCol);
+    // streets_.fit(vec, dayOfWeekCol + 2);
   }
 
   mat features = getDateFeatures(vec, dayOfWeekCol);
@@ -146,7 +149,7 @@ mat FeatureConverter::process(bool test) {
   mat districts = districts_.transform(vec, districtCol);
   mat daysOfWeek = daysOfWeek_.transform(vec, dayOfWeekCol);
 
-  // features.insert_cols(features.n_cols, districts);
+  features.insert_cols(features.n_cols, districts);
   features.insert_cols(features.n_cols, daysOfWeek);
 
   if (!test) {
@@ -155,7 +158,7 @@ mat FeatureConverter::process(bool test) {
   }
 
   // Escalo las features
-  features = scaleFeatures(features, mu_, sigma_, 4);
+  features = scaleFeatures(features, mu_, sigma_, 6);
 
   // Agrego bias
   features.insert_cols(0, colvec(features.n_rows).fill(1.0));

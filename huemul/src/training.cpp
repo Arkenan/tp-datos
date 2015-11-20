@@ -26,7 +26,7 @@ mat obtenerThetaEntrenado(mat X, mat Y){
   mat gradient(n, c);
   Theta.fill(1.0);
 
-  for (int i = 1; i < 100; i++){
+  for (int i = 1; i < 500; i++){
     /*
      * Gradient Descent para entrenar:
      * Aplica one versus all. Cada columna de Theta es un vector theta que le
@@ -46,10 +46,13 @@ mat obtenerThetaEntrenado(mat X, mat Y){
     Theta = Theta - gradient - reg;
 
 #ifndef DNDEBUG
-    double loss = logloss(predecir(X, Theta), Y);
-    printf ("terminada la iteración: %d, Logloss obtenido: %f \n", i, loss);
+    // double loss = logloss(predecir(X, Theta), Y);
+    // printf ("terminada la iteración: %d, Logloss obtenido: %f \n", i, loss);
+    printf ("terminada la iteración: %d\n", i, loss);
 #endif
   }
+  double loss = logloss(predecir(X, Theta), Y);
+  printf ("Logloss final: %f \n", loss);
 
   return Theta;
 }
