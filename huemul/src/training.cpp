@@ -19,11 +19,14 @@ mat obtenerThetaEntrenado(mat X, mat Y){
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
   int c = Y.n_cols; // Categorias posibles
+  double lambda = 4.0;
 
-  mat Theta(n,c);
+  mat Theta(n, c);
+  mat reg(n, c);
+  mat gradient(n, c);
   Theta.fill(1.0);
 
-  for (int i = 1; i < 30; i++){
+  for (int i = 1; i < 100; i++){
     /*
      * Gradient Descent para entrenar:
      * Aplica one versus all. Cada columna de Theta es un vector theta que le
@@ -37,7 +40,10 @@ mat obtenerThetaEntrenado(mat X, mat Y){
      * Y es la matriz de m x c que contiene las m respuestas representadas por
      * vectores de tamaño c.
     */
-    Theta = Theta - (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
+    gradient = (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
+    reg = (lambda / m) * Theta;
+    reg.row(0) = zeros<rowvec>(c);
+    Theta = Theta - gradient - reg;
 
 #ifndef DNDEBUG
     double loss = logloss(predecir(X, Theta), Y);

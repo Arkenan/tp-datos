@@ -180,29 +180,6 @@ map<string, int> getLabelMap(parsedStrings vec) {
   return labelMap;
 }
 
-mat getLabels(parsedStrings vec, map<string, int> labelsMap) {
-  mat labels(vec.size(), CANT_CATEGORIAS);
-  int counter = 0;
-  for(auto &item : vec) {
-    rowvec respuestaBinarizada = rowvec(CANT_CATEGORIAS);
-    respuestaBinarizada.zeros();
-    respuestaBinarizada.col( labelsMap.at(item[CATEGORY_COL]) ) = 1;
-    labels.row( counter ) = respuestaBinarizada;
-    counter++;
-  }
-  return labels;
-}
-
-
-mat getFeatures(parsedStrings vec, int datesCol) {
-
-  LabelBinarizer districts;
-
-  mat features = getDateFeatures(vec, datesCol);
-
-  return features;
-}
-
 mat scaleFeatures(mat X, mat mu, mat sigma, int columns) {
   for (unsigned int i = 0; i < columns; ++i) {
     X.col(i) = (X.col(i) - mu(i)) / sigma(i);
