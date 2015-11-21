@@ -9,7 +9,7 @@
 float ALPHA = 0.1;
 
 
-// Funcion sigmoide.
+// Funcion sigmoidea
 mat sigmoide(mat z) {
   return pow(1.0 + exp(-z), -1);
 }
@@ -64,11 +64,15 @@ mat SGD(mat X, mat Y){
     reg = (lambda / (m - its*SGD_N)) * Theta;
     reg.row(0) = zeros<rowvec>(c);
     Theta = Theta - gradient - reg;
-  }
+
 #ifndef DNDEBUG
-  double logLoss = logloss( sigmoide(X* Theta), Y);
-  cout << "logloss "  << logLoss << endl;
+    // double loss = logloss(predecir(X, Theta), Y);
+    // printf ("terminada la iteración: %d, Logloss obtenido: %f \n", i, loss);
+    printf ("terminada la iteración: %d\n", i, loss);
 #endif
+  }
+  double loss = logloss(predecir(X, Theta), Y);
+  printf ("Logloss final: %f \n", loss);
 
   return Theta;
 }
@@ -96,8 +100,8 @@ mat clipMat(mat matrix, double eps) {
       } else {
         Y_clipped(i, j) = eps;
       }
-    }
-  }
+    };
+  };
   return Y_clipped;
 }
 
