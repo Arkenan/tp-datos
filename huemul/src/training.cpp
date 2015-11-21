@@ -44,6 +44,7 @@ mat SGD(mat X, mat Y){
   // Cantidad de iteraciones para recorrer la matriz una vez.
   int its = m/SGD_N;
   mat subX, subY;
+  double loss;
 
   for (int i = 0; i < GD_IT; i++){
     // SGD. Debería modularizar un poco esto. Quizás con un define.
@@ -68,11 +69,12 @@ mat SGD(mat X, mat Y){
 #ifndef DNDEBUG
     // double loss = logloss(predecir(X, Theta), Y);
     // printf ("terminada la iteración: %d, Logloss obtenido: %f \n", i, loss);
-    printf ("terminada la iteración: %d\n", i, loss);
+    loss = logloss(predecir(X, Theta), Y);
+    printf ("terminada la iteración: %d, logloss, %G\n", i, loss);
 #endif
   }
-  double loss = logloss(predecir(X, Theta), Y);
-  printf ("Logloss final: %f \n", loss);
+  loss = logloss(predecir(X, Theta), Y);
+  printf ("Logloss final: %G \n", loss);
 
   return Theta;
 }
