@@ -52,7 +52,7 @@ int main(int argc, char const *argv[]) {
 
   // y_train.head_rows(50).raw_print();
   mat Theta;
-  D(Theta = obtenerThetaEntrenado(X_train, y_train), "train Logistic Regression");
+  D(Theta = SGD(X_train, y_train), "train Logistic Regression");
 
   mat result;
   D(result = predecir(X_test, Theta), "prediction");

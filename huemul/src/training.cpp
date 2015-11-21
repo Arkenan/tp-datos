@@ -1,9 +1,12 @@
 
 #include "training.hpp"
-
+// Cantidad de filas que toma SGD.
+#define SGD_N 40
+// Cantidad de iteraciones para gradient descent.
+#define GD_IT 100
 
 /* Logistic Regression con One vs. All */
-float ALPHA = 1;
+float ALPHA = 0.1;
 
 
 // Funcion sigmoidea
@@ -14,7 +17,7 @@ mat sigmoide(mat z) {
 // X es la matriz de datos ([m casos] X [n features + BIAS])
 // X ya se supone normalizada, y con la columna de BIAS agregada.
 // Y es la matriz de respuestas ([m casos] X [c categorias posibles])
-mat obtenerThetaEntrenado(mat X, mat Y){
+mat SGD(mat X, mat Y){
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
@@ -24,9 +27,7 @@ mat obtenerThetaEntrenado(mat X, mat Y){
   mat Theta(n, c);
   mat reg(n, c);
   mat gradient(n, c);
-  Theta.fill(1.0);
-
-  for (int i = 1; i < 500; i++){
+  Theta.fill(0.0);
     /*
      * Gradient Descent para entrenar:
      * Aplica one versus all. Cada columna de Theta es un vector theta que le
@@ -40,8 +41,27 @@ mat obtenerThetaEntrenado(mat X, mat Y){
      * Y es la matriz de m x c que contiene las m respuestas representadas por
      * vectores de tamaño c.
     */
-    gradient = (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
-    reg = (lambda / m) * Theta;
+  // Cantidad de iteraciones para recorrer la matriz una vez.
+  int its = m/SGD_N;
+  mat subX, subY;
+
+  for (int i = 0; i < GD_IT; i++){
+    cout << "iteracion " << i << endl;
+    // SGD. Debería modularizar un poco esto. Quizás con un define.
+    for (int j = 0; j < its; j++){
+      subX = X.rows(SGD_N*j, SGD_N*(j+1)-1);
+      subY = Y.rows(SGD_N*j, SGD_N*(j+1)-1);
+      gradient = (ALPHA / SGD_N) * subX.t() * (sigmoide(subX * Theta) - subY);
+      reg = (lambda / SGD_N) * Theta;
+      reg.row(0) = zeros<rowvec>(c);
+      Theta = Theta - gradient - reg;
+    }
+    // Tomo las filas que faltan.
+
+    subX = X.rows(its*SGD_N, m - 1);
+    subY = Y.rows(its*SGD_N, m - 1);
+    gradient = (ALPHA / (m - its*SGD_N)) * subX.t() * (sigmoide(subX * Theta) - subY);
+    reg = (lambda / (m - its*SGD_N)) * Theta;
     reg.row(0) = zeros<rowvec>(c);
     Theta = Theta - gradient - reg;
 
@@ -85,6 +105,28 @@ mat clipMat(mat matrix, double eps) {
   return Y_clipped;
 }
 
+// Gradient descent clásico / en tanda.
+mat GD(mat X, mat Y){
+
+  int m = X.n_rows; // Filas = casos
+  int n = X.n_cols; // Columnas = features + BIAS
+  int c = Y.n_cols; // Categorias posibles
+  double lambda = 4.0;
+
+  mat Theta(n, c);
+  mat reg(n, c);
+  mat gradient(n, c);
+  Theta.fill(1.0);
+
+  for (int i = 1; i < 100; i++){
+    gradient = (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
+    reg = (lambda / m) * Theta;
+    reg.row(0) = zeros<rowvec>(c);
+    Theta = Theta - gradient - reg;
+  }
+
+  return Theta;
+}
 
 double logloss(mat Y_pred, mat Y_true) {
   // Clip para mejorar logloss
