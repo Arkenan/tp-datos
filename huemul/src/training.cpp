@@ -3,7 +3,7 @@
 // Cantidad de filas que toma SGD.
 #define SGD_N 40
 // Cantidad de iteraciones para gradient descent.
-#define GD_IT 100
+#define GD_IT 10
 
 /* Logistic Regression con One vs. All */
 float ALPHA = 0.1;
@@ -37,7 +37,7 @@ mat SGD(mat X, mat Y){
      * de esta forma se entrena un vector theta para cada categoria.
 
      * La matriz Theta se va actualizando simultaneamente.
-     * g(X*Theta) resulta en una matriz de m x c .
+     * sigmoide(X*Theta) resulta en una matriz de m x c .
      * Y es la matriz de m x c que contiene las m respuestas representadas por
      * vectores de tamaño c.
     */
@@ -46,8 +46,8 @@ mat SGD(mat X, mat Y){
   mat subX, subY;
 
   for (int i = 0; i < GD_IT; i++){
-    cout << "iteracion " << i << endl;
     // SGD. Debería modularizar un poco esto. Quizás con un define.
+    cout << "iterancion " << i << endl;
     for (int j = 0; j < its; j++){
       subX = X.rows(SGD_N*j, SGD_N*(j+1)-1);
       subY = Y.rows(SGD_N*j, SGD_N*(j+1)-1);
@@ -65,6 +65,11 @@ mat SGD(mat X, mat Y){
     reg.row(0) = zeros<rowvec>(c);
     Theta = Theta - gradient - reg;
   }
+#ifndef DNDEBUG
+  double logLoss = logloss( sigmoide(X* Theta), Y);
+  cout << "logloss "  << logLoss << endl;
+#endif
+
   return Theta;
 }
 
@@ -109,7 +114,8 @@ mat GD(mat X, mat Y){
   mat gradient(n, c);
   Theta.fill(1.0);
 
-  for (int i = 1; i < 100; i++){
+  for (int i = 1; i < GD_IT; i++){
+    cout << "iterancion " << i << endl;
     gradient = (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
     reg = (lambda / m) * Theta;
     reg.row(0) = zeros<rowvec>(c);
