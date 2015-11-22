@@ -18,16 +18,20 @@ void LabelBinarizer::fit(parsedStrings vec, int column) {
     labels.insert(item[column]);
   }
 
-  int i = 0;
+  int i = labelsMap_.size();
+  printf("fiteo con %d\n", i);
   for (auto &label : labels) {
-    labelsMap_.emplace(label, i);
-    i++;
+    if (labelsMap_.count(label) == 0) {
+      labelsMap_.emplace(label, i);
+      i++;
+    }
   }
 
 #ifndef NDEBUG
-  for (const auto &p : labelsMap_) {
-      cout << p.first << " = " << p.second << '\n';
-  }
+  // for (const auto &p : labelsMap_) {
+  //     cout << p.first << " = " << p.second << '\n';
+  // }
+  cout << "Labels count: " << labelsMap_.size() << endl;
 #endif
 
 }
@@ -41,6 +45,17 @@ mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
   }
   return labels;
 }
+
+sp_mat LabelBinarizer::transformSparse(parsedStrings vec, int column) {
+  sp_mat labels(vec.size(), labelsMap_.size());
+  int counter = 0;
+  for(auto &item : vec) {
+    labels(counter, labelsMap_.at(item[column])) = 1;
+    counter++;
+  }
+  return labels;
+}
+
 
 mat LabelBinarizer::transform(parsedStrings vec, int column) {
   return transform(vec, column, labelsMap_.size());
@@ -125,36 +140,58 @@ mat FeatureConverter::getTestFeatures() {
   return process(true);
 };
 
+mat reduceDimensions(sp_mat X, int dimensions) {
+  printf("Starting SVD...\n");
+  clock_t tStart = clock();
+  mat U;
+  vec s;
+  mat V;
+  svds(U, s, V, X, dimensions, 0.3);  // SVD de las calles a 64 dimensiones
+
+  printf("Finished SVD, %.2fs elapsed\n", (float)(clock() - tStart) / CLOCKS_PER_SEC);
+  cout << "U size: " << U.n_rows << "x" << U.n_cols << endl;
+  cout << "s size: " << s.n_rows << "x" << s.n_cols << endl;
+  cout << "V size: " << V.n_rows << "x" << V.n_cols << endl;
+  return U;
+}
+
 mat FeatureConverter::process(bool test) {
 
-  int datesCol = 0, districtCol, dayOfWeekCol;
-  parsedStrings vec;
-
+  int datesCol = 0, districtCol, dayOfWeekCol, streetCol;
+  parsedStrings strings;
   if (test) {
-    districtCol = 2;
     dayOfWeekCol = 1;
-    vec = test_;
+    districtCol = 2;
+    streetCol = 3;
+    strings = test_;
   } else {
     dayOfWeekCol = 2;
     districtCol = 3;
-    vec = train_;
-    daysOfWeek_.fit(vec, dayOfWeekCol);
-    districts_.fit(vec, districtCol);
-    // streets_.fit(vec, dayOfWeekCol + 2);
+    streetCol = 4;
+    strings = train_;
+    daysOfWeek_.fit(strings, dayOfWeekCol);
+    districts_.fit(strings, districtCol);
+    // streets_.fit(train_, 4);
+    // streets_.fit(test_, 3);
   }
 
-  mat features = getDateFeatures(vec, dayOfWeekCol);
+  mat features = getDateFeatures(strings, dayOfWeekCol);
 
 
-  mat districts = districts_.transform(vec, districtCol);
-  mat daysOfWeek = daysOfWeek_.transform(vec, dayOfWeekCol);
+  mat districts = districts_.transform(strings, districtCol);
+  mat daysOfWeek = daysOfWeek_.transform(strings, dayOfWeekCol);
+  // sp_mat streets = streets_.transformSparse(strings, streetCol);
+
 
   features.insert_cols(features.n_cols, districts);
   features.insert_cols(features.n_cols, daysOfWeek);
 
+  // Esta parte tarda demasiado
+  features.insert_cols(features.n_cols, reduceDimensions(streets, 64));
+
   if (!test) {
-    mu_ = mean(features); // media
-    sigma_ = stddev(features); // desviacion estandar
+    mu_ = mean(features);  // media
+    sigma_ = stddev(features);  // desviacion estandar
   }
 
   // Escalo las features

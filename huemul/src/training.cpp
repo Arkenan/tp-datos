@@ -3,7 +3,7 @@
 // Cantidad de filas que toma SGD.
 #define SGD_N 40
 // Cantidad de iteraciones para gradient descent.
-#define GD_IT 10
+#define GD_IT 350
 
 /* Logistic Regression con One vs. All */
 float ALPHA = 1.0;
@@ -54,14 +54,15 @@ mat SGD(mat X, mat Y, double alpha) {
     subY = Y.rows(its*SGD_N, m - 1);
     Theta = gdStep(Theta, subX, subY, alpha, lambda);
 
-    printf ("terminada la iteración: %d\n", i);
+    cout << "terminada la iteración: %d" << i;
 #ifndef NDEBUG
     loss = logloss(predict(X, Theta), Y);
-    printf ("logloss %G\n", loss);
+    cout << " logloss %G" << loss;
 #endif
+    cout << endl;
   }
   loss = logloss(predict(X, Theta), Y);
-  printf ("Logloss final: %G \n", loss);
+  cout << "Logloss final: " << loss << endl;
 
   return Theta;
 }
@@ -105,22 +106,26 @@ mat GD(mat X, mat Y, double alpha) {
   int n = X.n_cols; // Columnas = features + BIAS
   int c = Y.n_cols; // Categorias posibles
   double lambda = 4.0;
+  double loss;
 
   mat Theta(n, c);
   mat reg(n, c);
   mat gradient(n, c);
   Theta.fill(0.0);
 
-  for (int i = 1; i < GD_IT; i++){
+  for (int i = 0; i < GD_IT; i++){
     // cout << "iterancion " << i << endl;
     Theta = gdStep(Theta, X, Y, alpha, lambda);
 
-    printf ("terminada la iteración: %d", i);
+    cout << "terminada la iteración " << i;
 #ifndef NDEBUG
-    double loss = logloss(predict(X, Theta), Y);
-    printf ("logloss %G\n", loss);
+    loss = logloss(predict(X, Theta), Y);
+    cout << " logloss " << loss;
 #endif
+    cout << endl;
   }
+  loss = logloss(predict(X, Theta), Y);
+  cout << "Logloss final: " << loss << endl;
 
   return Theta;
 }

@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
   }
   parsedStrings train;
   parsedStrings test;
-  D(train = getLines(argv[1],false), "getLines train");
+  D(train = getLines(argv[1], false), "getLines train");
   D(test = getLines(argv[2], true), "getLines test");
 
   FeatureConverter converter(train, test);
@@ -51,13 +51,13 @@ int main(int argc, char const *argv[]) {
   );
 
   // Release memory
-  // printf("Releasing memory\n");
-  // parsedStrings().swap(train);
-  // parsedStrings().swap(test);
+  printf("Releasing memory\n");
+  parsedStrings().swap(train);
+  parsedStrings().swap(test);
 
   // y_train.head_rows(50).raw_print();
   mat Theta;
-  D(Theta = SGD(X_train, y_train, 1.0), "train Logistic Regression");
+  // D(Theta = SGD(X_train, y_train, 1.0), "train Logistic Regression");
   D(Theta = GD(X_train, y_train, 1.0), "train Logistic Regression");
 
   mat result;
