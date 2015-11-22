@@ -187,7 +187,7 @@ mat FeatureConverter::process(bool test) {
   features.insert_cols(features.n_cols, daysOfWeek);
 
   // Esta parte tarda demasiado
-  features.insert_cols(features.n_cols, reduceDimensions(streets, 64));
+  //features.insert_cols(features.n_cols, reduceDimensions(streets, 64));
 
   if (!test) {
     mu_ = mean(features);  // media
