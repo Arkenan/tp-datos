@@ -10,7 +10,10 @@ mat sigmoide(mat z);
 mat SGD(mat X, mat Y);
 mat GD(mat X, mat Y);
 
-mat predecir(mat X_test, mat Theta);
+mat SGD(mat X, mat Y, double alpha);
+mat GD(mat X, mat Y, double alpha);
+
+mat predict(mat X_test, mat Theta);
 
 /**
  * Reemplaza todos los valores de la matriz menores que eps por eps, y mayores

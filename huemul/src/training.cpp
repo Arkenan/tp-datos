@@ -6,7 +6,7 @@
 #define GD_IT 10
 
 /* Logistic Regression con One vs. All */
-float ALPHA = 0.1;
+float ALPHA = 1.0;
 
 
 // Funcion sigmoidea
@@ -14,10 +14,17 @@ mat sigmoide(mat z) {
   return pow(1.0 + exp(-z), -1);
 }
 
+mat gdStep(mat Theta, mat X, mat Y, double alpha, double lambda) {
+  mat gradient = (alpha / X.n_rows) * X.t() * (sigmoide(X * Theta) - Y);
+  mat reg = (lambda / X.n_rows) * Theta;
+  reg.row(0) = zeros<rowvec>(Y.n_cols);
+  return Theta - gradient - reg;
+}
+
 // X es la matriz de datos ([m casos] X [n features + BIAS])
 // X ya se supone normalizada, y con la columna de BIAS agregada.
 // Y es la matriz de respuestas ([m casos] X [c categorias posibles])
-mat SGD(mat X, mat Y){
+mat SGD(mat X, mat Y, double alpha) {
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
@@ -28,58 +35,42 @@ mat SGD(mat X, mat Y){
   mat reg(n, c);
   mat gradient(n, c);
   Theta.fill(0.0);
-    /*
-     * Gradient Descent para entrenar:
-     * Aplica one versus all. Cada columna de Theta es un vector theta que le
-     * otorga un peso a cada feature, ademas del BIAS.
 
-     * Theta tiene tantas columnas como categorias posibles para clasificar,
-     * de esta forma se entrena un vector theta para cada categoria.
-
-     * La matriz Theta se va actualizando simultaneamente.
-     * sigmoide(X*Theta) resulta en una matriz de m x c .
-     * Y es la matriz de m x c que contiene las m respuestas representadas por
-     * vectores de tamaño c.
-    */
-  // Cantidad de iteraciones para recorrer la matriz una vez.
   int its = m/SGD_N;
   mat subX, subY;
   double loss;
 
   for (int i = 0; i < GD_IT; i++){
     // SGD. Debería modularizar un poco esto. Quizás con un define.
-    cout << "iterancion " << i << endl;
+    // cout << "iterancion " << i << endl;
     for (int j = 0; j < its; j++){
       subX = X.rows(SGD_N*j, SGD_N*(j+1)-1);
       subY = Y.rows(SGD_N*j, SGD_N*(j+1)-1);
-      gradient = (ALPHA / SGD_N) * subX.t() * (sigmoide(subX * Theta) - subY);
-      reg = (lambda / SGD_N) * Theta;
-      reg.row(0) = zeros<rowvec>(c);
-      Theta = Theta - gradient - reg;
+      Theta = gdStep(Theta, subX, subY, alpha, lambda);
     }
     // Tomo las filas que faltan.
 
     subX = X.rows(its*SGD_N, m - 1);
     subY = Y.rows(its*SGD_N, m - 1);
-    gradient = (ALPHA / (m - its*SGD_N)) * subX.t() * (sigmoide(subX * Theta) - subY);
-    reg = (lambda / (m - its*SGD_N)) * Theta;
-    reg.row(0) = zeros<rowvec>(c);
-    Theta = Theta - gradient - reg;
+    Theta = gdStep(Theta, subX, subY, alpha, lambda);
 
-#ifndef DNDEBUG
-    // double loss = logloss(predecir(X, Theta), Y);
-    // printf ("terminada la iteración: %d, Logloss obtenido: %f \n", i, loss);
-    loss = logloss(predecir(X, Theta), Y);
-    printf ("terminada la iteración: %d, logloss, %G\n", i, loss);
+    printf ("terminada la iteración: %d\n", i);
+#ifndef NDEBUG
+    loss = logloss(predict(X, Theta), Y);
+    printf ("logloss %G\n", loss);
 #endif
   }
-  loss = logloss(predecir(X, Theta), Y);
+  loss = logloss(predict(X, Theta), Y);
   printf ("Logloss final: %G \n", loss);
 
   return Theta;
 }
 
-mat predecir(mat X_test, mat Theta){
+mat SGD(mat X, mat Y) {
+  return SGD(X, Y, ALPHA);
+}
+
+mat predict(mat X_test, mat Theta){
   mat resultado = sigmoide(X_test * Theta);
   return resultado;
 }
@@ -108,7 +99,7 @@ mat clipMat(mat matrix, double eps) {
 }
 
 // Gradient descent clásico / en tanda.
-mat GD(mat X, mat Y){
+mat GD(mat X, mat Y, double alpha) {
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
@@ -118,17 +109,24 @@ mat GD(mat X, mat Y){
   mat Theta(n, c);
   mat reg(n, c);
   mat gradient(n, c);
-  Theta.fill(1.0);
+  Theta.fill(0.0);
 
   for (int i = 1; i < GD_IT; i++){
-    cout << "iterancion " << i << endl;
-    gradient = (ALPHA / m) * X.t() * (sigmoide(X * Theta) - Y);
-    reg = (lambda / m) * Theta;
-    reg.row(0) = zeros<rowvec>(c);
-    Theta = Theta - gradient - reg;
+    // cout << "iterancion " << i << endl;
+    Theta = gdStep(Theta, X, Y, alpha, lambda);
+
+    printf ("terminada la iteración: %d", i);
+#ifndef NDEBUG
+    double loss = logloss(predict(X, Theta), Y);
+    printf ("logloss %G\n", loss);
+#endif
   }
 
   return Theta;
+}
+
+mat GD(mat X, mat Y) {
+  return GD(X, Y, ALPHA);
 }
 
 double logloss(mat Y_pred, mat Y_true) {

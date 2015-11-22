@@ -24,7 +24,7 @@ void LabelBinarizer::fit(parsedStrings vec, int column) {
     i++;
   }
 
-#ifndef DNDEBUG
+#ifndef NDEBUG
   for (const auto &p : labelsMap_) {
       cout << p.first << " = " << p.second << '\n';
   }

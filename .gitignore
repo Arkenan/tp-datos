@@ -5,6 +5,8 @@ diseño/*
 !diseño/images
 /Debug/
 
+*.gz
+
 /huemul/debug
 /huemul/release
 /huemul/node_modules
