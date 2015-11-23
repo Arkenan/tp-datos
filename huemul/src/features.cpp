@@ -132,26 +132,42 @@ int getSeason(int month) {
   return result;
 }
 
-mat getDateFeatures(parsedStrings vec, int dayOfWeekCol) {
+parsedStrings getDates(parsedStrings vec) {
+  parsedStrings dates;
+  for (auto &item : vec) {
+    vector<string> row;
+    auto date = item[0];
+    // 2014-08-04 16:30:00
+    row.push_back(date.substr(0, 4));  // year
+    row.push_back(date.substr(5, 2));  // month
+    row.push_back(date.substr(8, 2));  // day
+    row.push_back(date.substr(11, 2));  // hour
+    dates.push_back(row);
+  }
+  return dates;
+}
+
+mat getScalarFeatures(parsedStrings vec, int dayOfWeekCol) {
   mat features(vec.size(), 13);
   int counter = 0;
+
   for(auto &item : vec) {
     auto date = item[0];
 
     // 2014-08-04 16:30:00
-    auto year = stoi(date.substr(0, 4));
+    // auto year = stoi(date.substr(0, 4));
     auto month = stoi(date.substr(5, 2));
-    auto day = stoi(date.substr(8, 2));
+    // auto day = stoi(date.substr(8, 2));
     auto hour = stoi(date.substr(11, 2));
 
-    features(counter, 0) = year;
-    features(counter, 1) = month;
-    features(counter, 2) = day;
-    features(counter, 3) = hour;
-    features(counter, 4) = stof(item[dayOfWeekCol + 3]);
-    features(counter, 5) = stof(item[dayOfWeekCol + 4]);
+    // features(counter, 0) = year;
+    // features(counter, 1) = month;
+    // features(counter, 2) = day;
+    // features(counter, 3) = hour;
+    features(counter, 0) = stof(item[dayOfWeekCol + 3]);  // X
+    features(counter, 1) = stof(item[dayOfWeekCol + 4]);  // Y
 
-    features(counter, 6 + getSeason(month)) = 1;
+    features(counter, 2 + getSeason(month)) = 1;
 
     auto dayOfWeek = item[dayOfWeekCol];
     auto address = item[dayOfWeekCol + 2];
@@ -160,19 +176,19 @@ mat getDateFeatures(parsedStrings vec, int dayOfWeekCol) {
     if (dayOfWeek.compare("Saturday") == 0 || dayOfWeek.compare("Sunday") == 0) {
       isWeekend = 1;
     }
-    features(counter, 10) = isWeekend;
+    features(counter, 6) = isWeekend;
 
     int isDayTime = 0;
     if (hour > 6 && hour < 20) {
       isDayTime = 1;
     }
-    features(counter, 11) = isDayTime;
+    features(counter, 7) = isDayTime;
 
     int isIntersection = 0;
     if (address.find('/') != string::npos) {
       isIntersection = 1;
     }
-    features(counter, 12) = isIntersection;
+    features(counter, 8) = isIntersection;
 
     counter++;
   }
@@ -219,12 +235,14 @@ mat FeatureConverter::process(bool test) {
   int datesCol = 0, districtCol, dayOfWeekCol, streetCol;
   string filename;
   parsedStrings strings;
+  parsedStrings dates;
   if (test) {
     filename = "../data/testUsvd.csv";
     dayOfWeekCol = 1;
     districtCol = 2;
     streetCol = 3;
     strings = test_;
+    dates = getDates(test_);
   } else {
     filename = "../data/trainUsvd.csv";
     dayOfWeekCol = 2;
@@ -233,18 +251,30 @@ mat FeatureConverter::process(bool test) {
     strings = train_;
     daysOfWeek_.fit(strings, dayOfWeekCol);
     districts_.fit(strings, districtCol);
+    dates = getDates(train_);
     // streets_.fit(train_, 4);
     // streets_.fit(test_, 3);
+    years_.fit(dates, 0);
+    months_.fit(dates, 1);
+    days_.fit(dates, 2);
+    hours_.fit(dates, 3);
   }
 
-  mat features = getDateFeatures(strings, dayOfWeekCol);
+  mat features = getScalarFeatures(strings, dayOfWeekCol);
 
 
   mat districts = districts_.transform(strings, districtCol);
   mat daysOfWeek = daysOfWeek_.transform(strings, dayOfWeekCol);
   // sp_mat streets = streets_.transformSparse(strings, streetCol);
+  mat years = years_.transform(dates, 0);
+  mat months = months_.transform(dates, 1);
+  mat days = days_.transform(dates, 2);
+  mat hours = hours_.transform(dates, 3);
 
-
+  features.insert_cols(features.n_cols, years);
+  features.insert_cols(features.n_cols, months);
+  features.insert_cols(features.n_cols, days);
+  features.insert_cols(features.n_cols, hours);
   features.insert_cols(features.n_cols, districts);
   features.insert_cols(features.n_cols, daysOfWeek);
 
@@ -257,12 +287,12 @@ mat FeatureConverter::process(bool test) {
   // features.insert_cols(features.n_cols, U);
 
   if (!test) {
-    mu_ = mean(features.cols(0, 6));  // media
-    sigma_ = stddev(features.cols(0, 6));  // desviacion estandar
+    mu_ = mean(features.cols(0, 2));  // media
+    sigma_ = stddev(features.cols(0, 2));  // desviacion estandar
   }
 
   // Escalo las features
-  features = scaleFeatures(features, mu_, sigma_, 6);
+  features = scaleFeatures(features, mu_, sigma_, 2);
 
   // Agrego bias
   features.insert_cols(0, colvec(features.n_rows).fill(1.0));

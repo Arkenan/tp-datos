@@ -121,6 +121,10 @@ class FeatureConverter {
 
     private:
       mat process(bool test);
+      LabelBinarizer years_;
+      LabelBinarizer months_;
+      LabelBinarizer days_;
+      LabelBinarizer hours_;
       LabelBinarizer districts_;
       LabelBinarizer daysOfWeek_;
       StreetBinarizer streets_;
