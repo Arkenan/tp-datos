@@ -57,6 +57,16 @@ class LabelBinarizer {
 };
 
 
+class StreetBinarizer:
+  public LabelBinarizer {
+  public:
+    void fit(parsedStrings vec, int column);
+    sp_mat transformSparse(parsedStrings vec, int column);
+  private:
+    vector<string> getItem(string item);
+    map<string, int> labelsMap_;
+};
+
 class FeatureConverter {
     public:
       FeatureConverter(parsedStrings train, parsedStrings test);
@@ -67,7 +77,7 @@ class FeatureConverter {
       mat process(bool test);
       LabelBinarizer districts_;
       LabelBinarizer daysOfWeek_;
-      LabelBinarizer streets_;
+      StreetBinarizer streets_;
       parsedStrings train_;
       parsedStrings test_;
 

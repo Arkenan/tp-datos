@@ -10,11 +10,11 @@ float ALPHA = 1.0;
 
 
 // Funcion sigmoidea
-mat sigmoide(mat z) {
+mat sigmoide(const mat& z) {
   return pow(1.0 + exp(-z), -1);
 }
 
-mat gdStep(mat Theta, mat X, mat Y, double alpha, double lambda) {
+mat gdStep(const mat& Theta, const mat& X, const mat& Y, double alpha, double lambda) {
   mat gradient = (alpha / X.n_rows) * X.t() * (sigmoide(X * Theta) - Y);
   mat reg = (lambda / X.n_rows) * Theta;
   reg.row(0) = zeros<rowvec>(Y.n_cols);
@@ -24,7 +24,7 @@ mat gdStep(mat Theta, mat X, mat Y, double alpha, double lambda) {
 // X es la matriz de datos ([m casos] X [n features + BIAS])
 // X ya se supone normalizada, y con la columna de BIAS agregada.
 // Y es la matriz de respuestas ([m casos] X [c categorias posibles])
-mat SGD(mat X, mat Y, double alpha) {
+mat SGD(const mat& X, const mat& Y, double alpha) {
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
@@ -56,8 +56,10 @@ mat SGD(mat X, mat Y, double alpha) {
 
     cout << "terminada la iteración: %d" << i;
 #ifndef NDEBUG
-    loss = logloss(predict(X, Theta), Y);
-    cout << " logloss %G" << loss;
+    if (i % 10 == 0) {
+      loss = logloss(predict(X, Theta), Y);
+      cout << " logloss %G" << loss;
+    }
 #endif
     cout << endl;
   }
@@ -67,17 +69,17 @@ mat SGD(mat X, mat Y, double alpha) {
   return Theta;
 }
 
-mat SGD(mat X, mat Y) {
+mat SGD(const mat& X, const mat& Y) {
   return SGD(X, Y, ALPHA);
 }
 
-mat predict(mat X_test, mat Theta){
+mat predict(const mat& X_test, const mat& Theta){
   mat resultado = sigmoide(X_test * Theta);
   return resultado;
 }
 
 
-mat clipMat(mat matrix, double eps) {
+mat clipMat(const mat& matrix, double eps) {
   // Clipping, no sé si es necesario
   int rows = matrix.n_rows;
   int cols = matrix.n_cols;
@@ -100,13 +102,15 @@ mat clipMat(mat matrix, double eps) {
 }
 
 // Gradient descent clásico / en tanda.
-mat GD(mat X, mat Y, double alpha) {
+mat GD(const mat& X, const mat& Y, double alpha) {
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
   int c = Y.n_cols; // Categorias posibles
   double lambda = 4.0;
   double loss;
+
+  cout << "Training dimensions: " << m << "x" << n << endl;
 
   mat Theta(n, c);
   mat reg(n, c);
@@ -119,8 +123,10 @@ mat GD(mat X, mat Y, double alpha) {
 
     cout << "terminada la iteración " << i;
 #ifndef NDEBUG
-    loss = logloss(predict(X, Theta), Y);
-    cout << " logloss " << loss;
+    if (i % 10 == 0) {
+      loss = logloss(predict(X, Theta), Y);
+      cout << " logloss " << loss;
+    }
 #endif
     cout << endl;
   }
@@ -130,11 +136,11 @@ mat GD(mat X, mat Y, double alpha) {
   return Theta;
 }
 
-mat GD(mat X, mat Y) {
+mat GD(const mat& X, const mat& Y) {
   return GD(X, Y, ALPHA);
 }
 
-double logloss(mat Y_pred, mat Y_true) {
+double logloss(const mat& Y_pred, const mat& Y_true) {
   // Clip para mejorar logloss
   mat Y_pred_clipped = clipMat(Y_pred, pow(10, -15));
   return -sum(sum(Y_true % log(Y_pred_clipped))) / Y_pred.n_rows;

@@ -5,22 +5,22 @@
 
 using namespace arma;
 
-mat sigmoide(mat z);
+mat sigmoide(const mat& z);
 
-mat SGD(mat X, mat Y);
-mat GD(mat X, mat Y);
+mat SGD(const mat& X, const mat& Y);
+mat GD(const mat& X, const mat& Y);
 
-mat SGD(mat X, mat Y, double alpha);
-mat GD(mat X, mat Y, double alpha);
+mat SGD(const mat& X, const mat& Y, double alpha);
+mat GD(const mat& X, const mat& Y, double alpha);
 
-mat predict(mat X_test, mat Theta);
+mat predict(const mat& X_test, const mat& Theta);
 
 /**
  * Reemplaza todos los valores de la matriz menores que eps por eps, y mayores
  * que 1-eps por 1-eps. Se suele usar esp = 1e-15
  */
-mat clipMat(mat matrix, double eps);
+mat clipMat(const mat& matrix, double eps);
 
-double logloss(mat Y_pred, mat Y_true);
+double logloss(const mat& Y_pred, const mat& Y_true);
 
 #endif

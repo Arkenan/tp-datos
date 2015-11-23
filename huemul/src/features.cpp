@@ -12,6 +12,9 @@ LabelBinarizer::LabelBinarizer() {
 }
 
 
+string addStreetName(parsedStrings& streets, string address) {
+}
+
 void LabelBinarizer::fit(parsedStrings vec, int column) {
   set<string> labels;
   for(auto &item : vec) {
@@ -19,7 +22,6 @@ void LabelBinarizer::fit(parsedStrings vec, int column) {
   }
 
   int i = labelsMap_.size();
-  printf("fiteo con %d\n", i);
   for (auto &label : labels) {
     if (labelsMap_.count(label) == 0) {
       labelsMap_.emplace(label, i);
@@ -46,16 +48,6 @@ mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
   return labels;
 }
 
-sp_mat LabelBinarizer::transformSparse(parsedStrings vec, int column) {
-  sp_mat labels(vec.size(), labelsMap_.size());
-  int counter = 0;
-  for(auto &item : vec) {
-    labels(counter, labelsMap_.at(item[column])) = 1;
-    counter++;
-  }
-  return labels;
-}
-
 
 mat LabelBinarizer::transform(parsedStrings vec, int column) {
   return transform(vec, column, labelsMap_.size());
@@ -65,6 +57,68 @@ map<string, int> LabelBinarizer::getLabels() {
   return labelsMap_;
 }
 
+
+vector<string> StreetBinarizer::getItem(string item) {
+  vector<string> vec;
+  int pos = item.find('/');
+  if (pos != string::npos) {
+    vec = getItem(item.substr(0, pos));
+    if (pos + 1 < item.size()) {
+      vec.push_back(getItem(item.substr(pos + 1, item.size()))[0]);
+    }
+  } else {
+    istringstream iss(item);
+    string token;
+    string s = "";
+    while ( getline(iss, token, ' ') ) {
+      if (token.size() > 2 && !any_of(token.begin(), token.end(), ::islower)
+                           && !all_of(token.begin(), token.end(), ::isdigit)) {
+        s += token + " ";
+      }
+    }
+    s.pop_back();
+    vec.push_back(s);
+  }
+  return vec;
+}
+
+
+void StreetBinarizer::fit(parsedStrings vec, int column) {
+  set<string> labels;
+  for(auto &item : vec) {
+    for(auto &label : getItem(item[column])) {
+      labels.insert(label);
+    }
+  }
+
+  int i = labelsMap_.size();
+  for (auto &label : labels) {
+    if (labelsMap_.count(label) == 0) {
+      labelsMap_.emplace(label, i);
+      i++;
+    }
+  }
+
+#ifndef NDEBUG
+  // for (const auto &p : labelsMap_) {
+  //     cout << p.first << " = " << p.second << '\n';
+  // }
+  cout << "Labels count: " << labelsMap_.size() << endl;
+#endif
+
+}
+
+sp_mat StreetBinarizer::transformSparse(parsedStrings vec, int column) {
+  sp_mat labels(vec.size(), labelsMap_.size());
+  int counter = 0;
+  for(auto &item : vec) {
+    for(auto &label : getItem(item[column])) {
+      labels(counter, labelsMap_.at(label)) = 1;
+    }
+    counter++;
+  }
+  return labels;
+}
 
 int getSeason(int month) {
   int result = 0;  // Winter
@@ -140,7 +194,7 @@ mat FeatureConverter::getTestFeatures() {
   return process(true);
 };
 
-mat reduceDimensions(sp_mat X, int dimensions) {
+mat reduceDimensions(sp_mat X, int dimensions, string filename) {
   printf("Starting SVD...\n");
   clock_t tStart = clock();
   mat U;
@@ -152,19 +206,30 @@ mat reduceDimensions(sp_mat X, int dimensions) {
   cout << "U size: " << U.n_rows << "x" << U.n_cols << endl;
   cout << "s size: " << s.n_rows << "x" << s.n_cols << endl;
   cout << "V size: " << V.n_rows << "x" << V.n_cols << endl;
+
+  if (!filename.empty()) {
+    U.save(filename);
+  }
   return U;
+}
+
+mat reduceDimensions(sp_mat X, int dimensions) {
+  return reduceDimensions(X, dimensions, "");
 }
 
 mat FeatureConverter::process(bool test) {
 
   int datesCol = 0, districtCol, dayOfWeekCol, streetCol;
+  string filename;
   parsedStrings strings;
   if (test) {
+    filename = "../data/testUsvd.csv";
     dayOfWeekCol = 1;
     districtCol = 2;
     streetCol = 3;
     strings = test_;
   } else {
+    filename = "../data/trainUsvd.csv";
     dayOfWeekCol = 2;
     districtCol = 3;
     streetCol = 4;
@@ -187,11 +252,16 @@ mat FeatureConverter::process(bool test) {
   features.insert_cols(features.n_cols, daysOfWeek);
 
   // Esta parte tarda demasiado
-  features.insert_cols(features.n_cols, reduceDimensions(streets, 64));
+  // mat U = reduceDimensions(streets, 128, filename);
+  // mat U;
+  // U.load(filename);
+  // De esta manera se puede hacer pruebas con menos filas:
+  // features.insert_cols(features.n_cols, U.rows(0, features.n_rows - 1));
+  // features.insert_cols(features.n_cols, U);
 
   if (!test) {
-    mu_ = mean(features);  // media
-    sigma_ = stddev(features);  // desviacion estandar
+    mu_ = mean(features.cols(0, 6));  // media
+    sigma_ = stddev(features.cols(0, 6));  // desviacion estandar
   }
 
   // Escalo las features
