@@ -12,9 +12,6 @@ LabelBinarizer::LabelBinarizer() {
 }
 
 
-string addStreetName(parsedStrings& streets, string address) {
-}
-
 void LabelBinarizer::fit(parsedStrings vec, int column) {
   set<string> labels;
   for(auto &item : vec) {
