@@ -130,6 +130,7 @@ net0 = NeuralNet(layers=[
                     ('dense1', DenseLayer),
                     ('output', DenseLayer)],
 
+                 objective='categorical_crossentropy',
                  input_shape=(None, num_features),
                  dense0_num_units=200,
                  dropout_p=0.5,
@@ -139,7 +140,7 @@ net0 = NeuralNet(layers=[
                  update=nesterov_momentum,
                  update_learning_rate=0.01,
                  update_momentum=0.9,
-                 
+
                  train_split=TrainSplit(eval_size=0.2),
                  verbose=1,
                  max_epochs=20)
