@@ -3,41 +3,41 @@
 // Cantidad de filas que toma SGD.
 #define SGD_N 40
 // Cantidad de iteraciones para gradient descent.
-#define GD_IT 600
+#define GD_IT 700
 
 /* Logistic Regression con One vs. All */
 float ALPHA = 1.0;
 
 
 // Funcion sigmoidea
-mat sigmoide(const mat& z) {
+fmat sigmoide(const fmat& z) {
   return pow(1.0 + exp(-z), -1);
 }
 
-mat gdStep(const mat& Theta, const mat& X, const mat& Y, double alpha, double lambda) {
-  mat gradient = (alpha / X.n_rows) * X.t() * (sigmoide(X * Theta) - Y);
-  mat reg = (lambda / X.n_rows) * Theta;
-  reg.row(0) = zeros<rowvec>(Y.n_cols);
+fmat gdStep(const fmat& Theta, const fmat& X, const fmat& Y, double alpha, double lambda) {
+  fmat gradient = (alpha / X.n_rows) * X.t() * (sigmoide(X * Theta) - Y);
+  fmat reg = (lambda / X.n_rows) * Theta;
+  reg.row(0) = zeros<frowvec>(Y.n_cols);
   return Theta - gradient - reg;
 }
 
 // X es la matriz de datos ([m casos] X [n features + BIAS])
 // X ya se supone normalizada, y con la columna de BIAS agregada.
 // Y es la matriz de respuestas ([m casos] X [c categorias posibles])
-mat SGD(const mat& X, const mat& Y, double alpha) {
+fmat SGD(const fmat& X, const fmat& Y, double alpha) {
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
   int c = Y.n_cols; // Categorias posibles
   double lambda = 4.0;
 
-  mat Theta(n, c);
-  mat reg(n, c);
-  mat gradient(n, c);
+  fmat Theta(n, c);
+  fmat reg(n, c);
+  fmat gradient(n, c);
   Theta.fill(0.0);
 
   int its = m/SGD_N;
-  mat subX, subY;
+  fmat subX, subY;
   double loss;
 
   for (int i = 0; i < GD_IT; i++){
@@ -69,21 +69,21 @@ mat SGD(const mat& X, const mat& Y, double alpha) {
   return Theta;
 }
 
-mat SGD(const mat& X, const mat& Y) {
+fmat SGD(const fmat& X, const fmat& Y) {
   return SGD(X, Y, ALPHA);
 }
 
-mat predict(const mat& X_test, const mat& Theta){
-  mat resultado = sigmoide(X_test * Theta);
+fmat predict(const fmat& X_test, const fmat& Theta){
+  fmat resultado = sigmoide(X_test * Theta);
   return resultado;
 }
 
 
-mat clipMat(const mat& matrix, double eps) {
+fmat clipMat(const fmat& matrix, double eps) {
   // Clipping, no sé si es necesario
   int rows = matrix.n_rows;
   int cols = matrix.n_cols;
-  mat Y_clipped(rows, cols);
+  fmat Y_clipped(rows, cols);
   for (int i = 0; i < rows; ++i) {
     for (int j = 0; j < cols; ++j) {
       double element = matrix(i, j);
@@ -102,7 +102,7 @@ mat clipMat(const mat& matrix, double eps) {
 }
 
 // Gradient descent clásico / en tanda.
-mat GD(const mat& X, const mat& Y, double alpha) {
+fmat GD(const fmat& X, const fmat& Y, double alpha) {
 
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
@@ -112,9 +112,9 @@ mat GD(const mat& X, const mat& Y, double alpha) {
 
   cout << "Training dimensions: " << m << "x" << n << endl;
 
-  mat Theta(n, c);
-  mat reg(n, c);
-  mat gradient(n, c);
+  fmat Theta(n, c);
+  fmat reg(n, c);
+  fmat gradient(n, c);
   Theta.fill(0.0);
 
   for (int i = 0; i < GD_IT; i++){
@@ -136,12 +136,12 @@ mat GD(const mat& X, const mat& Y, double alpha) {
   return Theta;
 }
 
-mat GD(const mat& X, const mat& Y) {
+fmat GD(const fmat& X, const fmat& Y) {
   return GD(X, Y, ALPHA);
 }
 
-double logloss(const mat& Y_pred, const mat& Y_true) {
+double logloss(const fmat& Y_pred, const fmat& Y_true) {
   // Clip para mejorar logloss
-  mat Y_pred_clipped = clipMat(Y_pred, pow(10, -15));
+  fmat Y_pred_clipped = clipMat(Y_pred, pow(10, -15));
   return -sum(sum(Y_true % log(Y_pred_clipped))) / Y_pred.n_rows;
 }

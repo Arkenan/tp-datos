@@ -63,7 +63,7 @@ parsedStrings getLines(string filename, bool test) {
 }
 
 
-void writeMatrix(mat matrix, map<string, int> labelsMap, string filename) {
+void writeMatrix(fmat matrix, map<string, int> labelsMap, string filename) {
   stringstream sourcestream;
 
   // Agrego headers

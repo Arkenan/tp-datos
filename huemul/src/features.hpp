@@ -23,23 +23,23 @@ map<string, int> getLabelMap(parsedStrings vec);
  * A partir del set de entrenamiento y el diccionario de clases, genera el
  * un vector de clases correspondientes a cada sample.
  */
-mat getLabels(parsedStrings vec, map<string, int> labelsMap);
+fmat getLabels(parsedStrings vec, map<string, int> labelsMap);
 
 /**
  * Convierte el set de entrenamiento en forma de strings en una matriz de
  * numeros.
  */
-mat getFeatures(parsedStrings vec, int datesCol);
+fmat getFeatures(parsedStrings vec, int datesCol);
 
 /**
  * Normaliza las columnas de la matrix X
  */
-mat scaleFeatures(mat X, mat mu, mat sigma);
+fmat scaleFeatures(fmat X, fmat mu, fmat sigma);
 
 /**
  * Escala las primeras @columns
  */
-mat scaleFeatures(mat X, mat mu, mat sigma, int colums);
+fmat scaleFeatures(fmat X, fmat mu, fmat sigma, int colums);
 
 
 /**
@@ -61,12 +61,12 @@ class LabelBinarizer {
        * del set, con un 1 en la columna correspondiente a la clase, y cero en
        * el resto.
        */
-      mat transform(parsedStrings vec, int colnum);
+      fmat transform(parsedStrings vec, int colnum);
 
       /**
        * Idem anterior, pero se le puede especificar la cantidad de columnas.
        */
-      mat transform(parsedStrings vec, int column, int features);
+      fmat transform(parsedStrings vec, int column, int features);
 
       virtual string getItem(string item);
 
@@ -129,11 +129,11 @@ class PositionBinarizer:
 class FeatureConverter {
     public:
       FeatureConverter(parsedStrings train, parsedStrings test);
-      mat getTestFeatures();
-      mat getTrainFeatures();
+      fmat getTestFeatures();
+      fmat getTrainFeatures();
 
     private:
-      mat process(bool test);
+      fmat process(bool test);
       LabelBinarizer years_;
       LabelBinarizer months_;
       LabelBinarizer days_;
@@ -146,8 +146,8 @@ class FeatureConverter {
       parsedStrings train_;
       parsedStrings test_;
 
-      mat mu_;  // media
-      mat sigma_;  // desviación standard
+      fmat mu_;  // media
+      fmat sigma_;  // desviación standard
 
 };
 

@@ -39,8 +39,8 @@ string LabelBinarizer::getItem(string item) {
   return item;
 }
 
-mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
-  mat labels = zeros(vec.size(), features);
+fmat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
+  fmat labels = zeros<fmat>(vec.size(), features);
   int counter = 0;
   for(auto &item : vec) {
     labels(counter, labelsMap_.at(getItem(item[column]))) = 1;
@@ -50,7 +50,7 @@ mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
 }
 
 
-mat LabelBinarizer::transform(parsedStrings vec, int column) {
+fmat LabelBinarizer::transform(parsedStrings vec, int column) {
   return transform(vec, column, labelsMap_.size());
 }
 
@@ -171,15 +171,15 @@ parsedStrings getDates(parsedStrings vec) {
   return dates;
 }
 
-mat getScalarFeatures(parsedStrings vec, int dayOfWeekCol) {
-  mat features(vec.size(), 13);
+fmat getScalarFeatures(parsedStrings vec, int dayOfWeekCol) {
+  fmat features(vec.size(), 13);
   int counter = 0;
 
   for(auto &item : vec) {
     auto date = item[0];
 
     // 2014-08-04 16:30:00
-    // auto year = stoi(date.substr(0, 4));
+    auto year = stoi(date.substr(0, 4));
     auto month = stoi(date.substr(5, 2));
     // auto day = stoi(date.substr(8, 2));
     auto hour = stoi(date.substr(11, 2));
@@ -188,10 +188,10 @@ mat getScalarFeatures(parsedStrings vec, int dayOfWeekCol) {
     // features(counter, 1) = month;
     // features(counter, 2) = day;
     // features(counter, 3) = hour;
-    features(counter, 0) = stof(item[dayOfWeekCol + 3]);  // X
-    features(counter, 1) = stof(item[dayOfWeekCol + 4]);  // Y
+    // features(counter, 0) = stof(item[dayOfWeekCol + 3]);  // X
+    // features(counter, 1) = stof(item[dayOfWeekCol + 4]);  // Y
 
-    features(counter, 2 + getSeason(month)) = 1;
+    features(counter, 0 + getSeason(month)) = 1;
 
     auto dayOfWeek = item[dayOfWeekCol];
     auto address = item[dayOfWeekCol + 2];
@@ -200,19 +200,23 @@ mat getScalarFeatures(parsedStrings vec, int dayOfWeekCol) {
     if (dayOfWeek.compare("Saturday") == 0 || dayOfWeek.compare("Sunday") == 0) {
       isWeekend = 1;
     }
-    features(counter, 6) = isWeekend;
+    features(counter, 4) = isWeekend;
 
     int isDayTime = 0;
     if (hour > 6 && hour < 20) {
       isDayTime = 1;
     }
-    features(counter, 7) = isDayTime;
+    features(counter, 5) = isDayTime;
+
+    features(counter, 6) = (year < 2006) * 1;
+    features(counter, 7) = (year < 2010) * 1;
+    features(counter, 8) = (year < 2012) * 1;
 
     int isIntersection = 0;
     if (address.find('/') != string::npos) {
       isIntersection = 1;
     }
-    features(counter, 8) = isIntersection;
+    features(counter, 9) = isIntersection;
 
     counter++;
   }
@@ -224,10 +228,10 @@ mat getScalarFeatures(parsedStrings vec, int dayOfWeekCol) {
 FeatureConverter::FeatureConverter(parsedStrings train, parsedStrings test):
   train_(train), test_(test) {}
 
-mat FeatureConverter::getTrainFeatures() {
+fmat FeatureConverter::getTrainFeatures() {
   return process(false);
 };
-mat FeatureConverter::getTestFeatures() {
+fmat FeatureConverter::getTestFeatures() {
   return process(true);
 };
 
@@ -256,7 +260,7 @@ mat reduceDimensions(sp_mat X, int dimensions) {
   return reduceDimensions(X, dimensions, "");
 }
 
-mat FeatureConverter::process(bool test) {
+fmat FeatureConverter::process(bool test) {
 
   int datesCol = 0, districtCol, dayOfWeekCol, streetCol, Xcol, Ycol;
   string filename;
@@ -302,47 +306,39 @@ mat FeatureConverter::process(bool test) {
     hours_.fit(dates, 3);
   }
 
-  mat features = getScalarFeatures(strings, dayOfWeekCol);
+  fmat features = getScalarFeatures(strings, dayOfWeekCol);
 
 
-  mat districts = districts_.transform(strings, districtCol);
-  mat daysOfWeek = daysOfWeek_.transform(strings, dayOfWeekCol);
-  mat xs = Xs_.transform(strings, Xcol);
-  mat ys = Ys_.transform(strings, Ycol);
   // sp_mat streets = streets_.transformSparse(strings, streetCol);
-  mat years = years_.transform(dates, 0);
-  mat months = months_.transform(dates, 1);
-  mat days = days_.transform(dates, 2);
-  mat hours = hours_.transform(dates, 3);
 
-  features.insert_cols(features.n_cols, years);
-  features.insert_cols(features.n_cols, months);
-  features.insert_cols(features.n_cols, days);
-  features.insert_cols(features.n_cols, hours);
-  features.insert_cols(features.n_cols, districts);
-  features.insert_cols(features.n_cols, daysOfWeek);
-  features.insert_cols(features.n_cols, xs);
-  features.insert_cols(features.n_cols, ys);
+  features.insert_cols(features.n_cols, years_.transform(dates, 0));
+  features.insert_cols(features.n_cols, months_.transform(dates, 1));
+  features.insert_cols(features.n_cols, days_.transform(dates, 2));
+  features.insert_cols(features.n_cols, hours_.transform(dates, 3));
+  features.insert_cols(features.n_cols, districts_.transform(strings, districtCol));
+  features.insert_cols(features.n_cols, daysOfWeek_.transform(strings, dayOfWeekCol));
+  features.insert_cols(features.n_cols, Xs_.transform(strings, Xcol));
+  features.insert_cols(features.n_cols, Ys_.transform(strings, Ycol));
 
   // Esta parte tarda demasiado
-  // mat U = reduceDimensions(streets, 128, filename);
+  // fmat U = conv_to<fmat>::from(reduceDimensions(streets, 128, filename);
 
-  // mat U;
+  // fmat U;
   // U.load(filename);
   // De esta manera se puede hacer pruebas con menos filas:
   // features.insert_cols(features.n_cols, U.rows(0, features.n_rows - 1));
   // features.insert_cols(features.n_cols, U);
 
-  if (!test) {
-    mu_ = mean(features.cols(0, 2));  // media
-    sigma_ = stddev(features.cols(0, 2));  // desviacion estandar
-  }
+  // if (!test) {
+  //   mu_ = mean(features.cols(0, 2));  // media
+  //   sigma_ = stddev(features.cols(0, 2));  // desviacion estandar
+  // }
 
   // Escalo las features
-  features = scaleFeatures(features, mu_, sigma_, 2);
+  // features = scaleFeatures(features, mu_, sigma_, 2);
 
   // Agrego bias
-  features.insert_cols(0, colvec(features.n_rows).fill(1.0));
+  features.insert_cols(0, ones<fmat>(features.n_rows, 1));
 
   // features.head_rows(50).raw_print();
 
@@ -364,13 +360,13 @@ map<string, int> getLabelMap(parsedStrings vec) {
   return labelMap;
 }
 
-mat scaleFeatures(mat X, mat mu, mat sigma, int columns) {
+fmat scaleFeatures(fmat X, fmat mu, fmat sigma, int columns) {
   for (unsigned int i = 0; i < columns; ++i) {
     X.col(i) = (X.col(i) - mu(i)) / sigma(i);
   }
   return X;
 }
 
-mat scaleFeatures(mat X, mat mu, mat sigma) {
+fmat scaleFeatures(fmat X, fmat mu, fmat sigma) {
   return scaleFeatures(X, mu, sigma, X.n_cols);
 }
