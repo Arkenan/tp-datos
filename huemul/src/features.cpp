@@ -172,7 +172,7 @@ parsedStrings getDates(parsedStrings vec) {
 }
 
 fmat getScalarFeatures(parsedStrings vec, int dayOfWeekCol) {
-  fmat features(vec.size(), 13);
+  fmat features(vec.size(), 10);
   int counter = 0;
 
   for(auto &item : vec) {
