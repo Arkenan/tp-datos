@@ -30,8 +30,8 @@ int main(int argc, char const *argv[]) {
   }
   parsedStrings train;
   parsedStrings test;
-  D(train = getLines(argv[1], false), "getLines train");
-  D(test = getLines(argv[2], true), "getLines test");
+  D(train = getLines(argv[1], 100000  , false), "getLines train");
+  D(test = getLines(argv[2], 100000, true), "getLines test");
 
   FeatureConverter converter(train, test);
 

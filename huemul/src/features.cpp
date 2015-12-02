@@ -15,7 +15,7 @@ LabelBinarizer::LabelBinarizer() {
 void LabelBinarizer::fit(parsedStrings vec, int column) {
   set<string> labels;
   for(auto &item : vec) {
-    labels.insert(item[column]);
+    labels.insert(getItem(item[column]));
   }
 
   int i = labelsMap_.size();
@@ -35,11 +35,15 @@ void LabelBinarizer::fit(parsedStrings vec, int column) {
 
 }
 
+string LabelBinarizer::getItem(string item) {
+  return item;
+}
+
 mat LabelBinarizer::transform(parsedStrings vec, int column, int features) {
   mat labels = zeros(vec.size(), features);
   int counter = 0;
   for(auto &item : vec) {
-    labels(counter, labelsMap_.at(item[column])) = 1;
+    labels(counter, labelsMap_.at(getItem(item[column]))) = 1;
     counter++;
   }
   return labels;
@@ -106,15 +110,35 @@ void StreetBinarizer::fit(parsedStrings vec, int column) {
 }
 
 sp_mat StreetBinarizer::transformSparse(parsedStrings vec, int column) {
-  sp_mat labels(vec.size(), labelsMap_.size());
+  int elems = 0;
+  for(auto &item : vec) {
+    for(auto &label : getItem(item[column])) {
+      elems++;
+    }
+  }
+  umat locations(2, elems);
+  elems = 0;
   int counter = 0;
   for(auto &item : vec) {
     for(auto &label : getItem(item[column])) {
-      labels(counter, labelsMap_.at(label)) = 1;
+      locations(0, elems) = counter;
+      locations(1, elems) = labelsMap_.at(label);
+      elems++;
     }
     counter++;
   }
+  mat values = ones(elems);
+  sp_mat labels(true, locations, values, counter, labelsMap_.size());
+  cout << "Sparse matrix size: " << labels.n_rows << "x" << labels.n_cols << endl;
   return labels;
+}
+
+string PositionBinarizer::getItem(string item) {
+  int pos = item.find('.');
+  return item.substr(0, pos + 4);
+  // float val = stof(item);
+  // float nearest = roundf(val * 100) / 100;
+  // return to_string(nearest);
 }
 
 int getSeason(int month) {
@@ -223,6 +247,8 @@ mat reduceDimensions(sp_mat X, int dimensions, string filename) {
   if (!filename.empty()) {
     U.save(filename);
   }
+  cout << "Suma de las primeras filas de U " << sum(U.rows(0, 1)) << endl;
+  cout << "Suma de las primeras columnas de U " << sum(U.cols(0, 1)) << endl;
   return U;
 }
 
@@ -232,7 +258,7 @@ mat reduceDimensions(sp_mat X, int dimensions) {
 
 mat FeatureConverter::process(bool test) {
 
-  int datesCol = 0, districtCol, dayOfWeekCol, streetCol;
+  int datesCol = 0, districtCol, dayOfWeekCol, streetCol, Xcol, Ycol;
   string filename;
   parsedStrings strings;
   parsedStrings dates;
@@ -241,6 +267,8 @@ mat FeatureConverter::process(bool test) {
     dayOfWeekCol = 1;
     districtCol = 2;
     streetCol = 3;
+    Xcol = 4;
+    Ycol = 5;
     strings = test_;
     dates = getDates(test_);
   } else {
@@ -248,15 +276,29 @@ mat FeatureConverter::process(bool test) {
     dayOfWeekCol = 2;
     districtCol = 3;
     streetCol = 4;
+    Xcol = 5;
+    Ycol = 6;
     strings = train_;
+    cout << "Days of week" << endl;
     daysOfWeek_.fit(strings, dayOfWeekCol);
+    cout << "Districts" << endl;
     districts_.fit(strings, districtCol);
     dates = getDates(train_);
     // streets_.fit(train_, 4);
     // streets_.fit(test_, 3);
+    cout << "Xs" << endl;
+    Xs_.fit(train_, 5);
+    Xs_.fit(test_, 4);
+    cout << "Ys" << endl;
+    Ys_.fit(train_, 6);
+    Ys_.fit(test_, 5);
+    cout << "years" << endl;
     years_.fit(dates, 0);
+    cout << "months" << endl;
     months_.fit(dates, 1);
+    cout << "days" << endl;
     days_.fit(dates, 2);
+    cout << "hours" << endl;
     hours_.fit(dates, 3);
   }
 
@@ -265,6 +307,8 @@ mat FeatureConverter::process(bool test) {
 
   mat districts = districts_.transform(strings, districtCol);
   mat daysOfWeek = daysOfWeek_.transform(strings, dayOfWeekCol);
+  mat xs = Xs_.transform(strings, Xcol);
+  mat ys = Ys_.transform(strings, Ycol);
   // sp_mat streets = streets_.transformSparse(strings, streetCol);
   mat years = years_.transform(dates, 0);
   mat months = months_.transform(dates, 1);
@@ -277,9 +321,12 @@ mat FeatureConverter::process(bool test) {
   features.insert_cols(features.n_cols, hours);
   features.insert_cols(features.n_cols, districts);
   features.insert_cols(features.n_cols, daysOfWeek);
+  features.insert_cols(features.n_cols, xs);
+  features.insert_cols(features.n_cols, ys);
 
   // Esta parte tarda demasiado
   // mat U = reduceDimensions(streets, 128, filename);
+
   // mat U;
   // U.load(filename);
   // De esta manera se puede hacer pruebas con menos filas:

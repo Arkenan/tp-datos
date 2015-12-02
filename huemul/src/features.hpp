@@ -68,6 +68,8 @@ class LabelBinarizer {
        */
       mat transform(parsedStrings vec, int column, int features);
 
+      virtual string getItem(string item);
+
       map<string, int> getLabels();
     private:
       map<string, int> labelsMap_;
@@ -83,13 +85,24 @@ class LabelBinarizer {
  * OAK ST / LAGUNA ST -> [LAGUNA, OAK]
  * 600 Block of 47TH AV -> [47TH]
  */
-class StreetBinarizer:
-  public LabelBinarizer {
+class StreetBinarizer {
   public:
     void fit(parsedStrings vec, int column);
     sp_mat transformSparse(parsedStrings vec, int column);
   private:
     vector<string> getItem(string item);
+    map<string, int> labelsMap_;
+};
+
+
+/**
+ * Un binarizador para el X e Y.
+ */
+class PositionBinarizer:
+  public LabelBinarizer {
+  public:
+    virtual string getItem(string item);
+  private:
     map<string, int> labelsMap_;
 };
 
@@ -128,6 +141,8 @@ class FeatureConverter {
       LabelBinarizer districts_;
       LabelBinarizer daysOfWeek_;
       StreetBinarizer streets_;
+      PositionBinarizer Xs_;
+      PositionBinarizer Ys_;
       parsedStrings train_;
       parsedStrings test_;
 

@@ -3,7 +3,7 @@
 // Cantidad de filas que toma SGD.
 #define SGD_N 40
 // Cantidad de iteraciones para gradient descent.
-#define GD_IT 250
+#define GD_IT 600
 
 /* Logistic Regression con One vs. All */
 float ALPHA = 1.0;
