@@ -3,7 +3,7 @@
 // Cantidad de filas que toma SGD.
 #define SGD_N 40
 // Cantidad de iteraciones para gradient descent.
-#define GD_IT 700
+#define GD_IT 1200
 
 /* Logistic Regression con One vs. All */
 float ALPHA = 1.0;
@@ -101,9 +101,7 @@ fmat clipMat(const fmat& matrix, double eps) {
   return Y_clipped;
 }
 
-// Gradient descent clásico / en tanda.
-fmat GD(const fmat& X, const fmat& Y, double alpha) {
-
+fmat GD(const fmat& X, const fmat& Y, double alpha, fmat Theta, int iters) {
   int m = X.n_rows; // Filas = casos
   int n = X.n_cols; // Columnas = features + BIAS
   int c = Y.n_cols; // Categorias posibles
@@ -112,12 +110,10 @@ fmat GD(const fmat& X, const fmat& Y, double alpha) {
 
   cout << "Training dimensions: " << m << "x" << n << endl;
 
-  fmat Theta(n, c);
   fmat reg(n, c);
   fmat gradient(n, c);
-  Theta.fill(0.0);
 
-  for (int i = 0; i < GD_IT; i++){
+  for (int i = 0; i < iters; i++){
     // cout << "iterancion " << i << endl;
     Theta = gdStep(Theta, X, Y, alpha, lambda);
 
@@ -134,6 +130,12 @@ fmat GD(const fmat& X, const fmat& Y, double alpha) {
   cout << "Logloss final: " << loss << endl;
 
   return Theta;
+}
+
+// Gradient descent clásico / en tanda.
+fmat GD(const fmat& X, const fmat& Y, double alpha) {
+  fmat Theta = zeros<fmat>(X.n_cols, Y.n_cols);
+  return GD(X, Y, alpha, Theta, GD_IT);
 }
 
 fmat GD(const fmat& X, const fmat& Y) {

@@ -62,11 +62,21 @@ int main(int argc, char const *argv[]) {
 
   fmat result;
   D(result = predict(X_test, Theta), "prediction");
+  D(writeMatrix(result, categories.getLabels(), "output1200.csv.gz"), "write 1200 output");
 
 
-  cout << "rows "  << result.n_rows << endl;
+  D(Theta = GD(X_train, y_train, 1.0, Theta, 200), "200 more iterations");
+  D(result = predict(X_test, Theta), "prediction");
+  D(writeMatrix(result, categories.getLabels(), "output1400.csv.gz"), "write 1400 output");
 
-  D(writeMatrix(result, categories.getLabels(), "output.csv.gz"), "write output");
+
+  D(Theta = GD(X_train, y_train, 1.0, Theta, 100), "100 more iterations");
+  D(result = predict(X_test, Theta), "prediction");
+  D(writeMatrix(result, categories.getLabels(), "output1500.csv.gz"), "write 1500 output");
+
+  D(Theta = GD(X_train, y_train, 1.0, Theta, 100), "100 more iterations");
+  D(result = predict(X_test, Theta), "prediction");
+  D(writeMatrix(result, categories.getLabels(), "output1600.csv.gz"), "write 1600 output");
 
   return 0;
 }

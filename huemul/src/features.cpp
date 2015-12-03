@@ -311,7 +311,7 @@ fmat FeatureConverter::process(bool test) {
 
   // sp_mat streets = streets_.transformSparse(strings, streetCol);
 
-  features.insert_cols(features.n_cols, years_.transform(dates, 0));
+  // features.insert_cols(features.n_cols, years_.transform(dates, 0));
   features.insert_cols(features.n_cols, months_.transform(dates, 1));
   features.insert_cols(features.n_cols, days_.transform(dates, 2));
   features.insert_cols(features.n_cols, hours_.transform(dates, 3));

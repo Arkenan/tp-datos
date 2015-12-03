@@ -13,6 +13,8 @@ fmat GD(const fmat& X, const fmat& Y);
 fmat SGD(const fmat& X, const fmat& Y, double alpha);
 fmat GD(const fmat& X, const fmat& Y, double alpha);
 
+fmat GD(const fmat& X, const fmat& Y, double alpha, fmat Theta, int iters);
+
 fmat predict(const fmat& X_test, const fmat& Theta);
 
 /**
